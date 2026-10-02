@@ -2,6 +2,11 @@
 'use strict';
 const { Printer, profiles, profileById, NetTransport } = require('../dist');
 
+process.stdout.on('error', (err) => {
+  if (err.code === 'EPIPE') process.exit(0);
+  throw err;
+});
+
 const USAGE = `thermal-print <command> [options]
 
 Commands

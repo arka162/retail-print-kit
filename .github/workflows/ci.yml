@@ -19,5 +19,5 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      - run: node bin/thermal-print.js test --dry --profile star-tsp100 | head -c 64
+      - run: node bin/thermal-print.js test --dry --profile star-tsp100 | wc -c
         shell: bash
