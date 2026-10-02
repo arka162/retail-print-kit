@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>thermal-print designer</title>
+<link rel="stylesheet" href="designer.css">
+</head>
+<body>
+<header>
+  <strong>thermal-print designer</strong>
+  <label>Name <input id="name" placeholder="receipt"></label>
+  <label>Kind
+    <select id="kind"><option value="receipt">Receipt</option><option value="label">Label</option></select>
+  </label>
+  <span id="receipt-opts">
+    <label>Profile <select id="profile"></select></label>
+  </span>
+  <span id="label-opts" hidden>
+    <label>W mm <input id="widthMm" type="number" step="0.1" value="50.8" size="5"></label>
+    <label>H mm <input id="heightMm" type="number" step="0.1" value="25.4" size="5"></label>
+    <label>dpi <select id="dpi"><option>203</option><option>300</option><option>600</option></select></label>
+    <label>Language <select id="language"><option value="zpl">ZPL</option><option value="tspl">TSPL</option><option value="ezpl">EZPL</option></select></label>
+  </span>
+  <span class="grow"></span>
+  <button id="new">New</button>
+  <button id="import">Import</button>
+  <button id="export">Export JSON</button>
+  <button id="copy">Copy JSON</button>
+  <button id="code" title="Printer command stream for the current data">Show bytes</button>
+  <input id="file" type="file" accept="application/json" hidden>
+</header>
+<main>
+  <section id="palette-col">
+    <h2>Add</h2>
+    <div id="palette"></div>
+    <h2>Blocks</h2>
+    <div id="tree"></div>
+  </section>
+  <section id="props-col">
+    <h2>Properties</h2>
+    <div id="props"><p class="muted">Select a block.</p></div>
+    <h2>Sample data</h2>
+    <textarea id="data" spellcheck="false"></textarea>
+    <div id="error" class="error" hidden></div>
+  </section>
+  <section id="preview-col">
+    <h2>Preview</h2>
+    <div id="preview"></div>
+    <pre id="bytes" hidden></pre>
+  </section>
+</main>
+<script src="../../dist/browser/thermal-print.js"></script>
+<script src="designer.js"></script>
+</body>
+</html>

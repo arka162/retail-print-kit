@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 const fs = require('fs');
-const { Printer, profiles, profileById, NetTransport, identify, opsToHtml, opsToPng, OpBuilder } = require('../dist');
+const { Printer, profiles, profileById, NetTransport, identify, opsToHtml, opsToPng, OpBuilder, render, renderLabel, encodeLabel, labelToSvg } = require('../dist');
 
 process.stdout.on('error', (err) => {
   if (err.code === 'EPIPE') process.exit(0);
@@ -16,6 +16,8 @@ Commands
   status     print the printer status as JSON
   identify   ask the printer its maker, model and firmware; suggest a profile
   preview    write the test page as HTML (--out page.html) or PNG (--out page.png)
+  print      print a template: --template t.json --data d.json (receipt or label)
+             a label needs --language zpl|tspl|ezpl; --out file.svg|.html|.txt previews instead
   profiles   list printer profiles
   list       list USB printers and serial ports
 
@@ -152,6 +154,33 @@ async function main() {
         await t.close();
       }
       return;
+    }
+    case 'print': {
+      const tpl = JSON.parse(fs.readFileSync(String(args.template), 'utf8'));
+      const data = args.data ? JSON.parse(fs.readFileSync(String(args.data), 'utf8')) : {};
+      if (tpl.kind === 'label') {
+        const label = renderLabel(tpl, data);
+        const language = String(args.language || 'zpl');
+        if (args.out) {
+          const out = String(args.out);
+          fs.writeFileSync(out, out.endsWith('.svg') ? labelToSvg(label) : Buffer.from(encodeLabel(label, language)));
+          console.log(`wrote ${out}`);
+          return;
+        }
+        const t = transportFor(args);
+        await t.open();
+        try { await t.write(Buffer.from(encodeLabel(label, language))); } finally { await t.close(); }
+        return;
+      }
+      const profile = profileById(String(args.profile || 'epson-tm-t88'));
+      if (args.out) {
+        const out = String(args.out);
+        const ops = render(tpl, data, profile);
+        fs.writeFileSync(out, out.endsWith('.png') ? opsToPng(ops, profile) : opsToHtml(ops, profile));
+        console.log(`wrote ${out}`);
+        return;
+      }
+      return withPrinter(args, async (p) => { p.render(tpl, data); });
     }
     case 'preview': {
       const profile = profileById(String(args.profile || 'epson-tm-t88'));

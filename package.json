@@ -26,6 +26,11 @@
     "./serial": {
       "types": "./dist/transports/serial.d.ts",
       "default": "./dist/transports/serial.js"
+    },
+    "./browser": {
+      "types": "./dist/browser.d.ts",
+      "import": "./dist/browser/thermal-print.mjs",
+      "default": "./dist/browser/thermal-print.js"
     }
   },
   "files": [
@@ -38,9 +43,10 @@
     "node": ">=18"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && npm run build:browser",
     "test": "npm run build && node --test test/run.js",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "build:browser": "esbuild src/browser.ts --bundle --format=iife --global-name=ThermalPrint --platform=browser --external:zlib --outfile=dist/browser/thermal-print.js --minify --sourcemap && esbuild src/browser.ts --bundle --format=esm --platform=browser --external:zlib --outfile=dist/browser/thermal-print.mjs --minify"
   },
   "dependencies": {
     "iconv-lite": "^0.6.3",
@@ -63,6 +69,7 @@
     "@napi-rs/canvas": "^0.1.100",
     "@types/node": "^18.19.0",
     "@types/qrcode": "^1.5.6",
+    "esbuild": "^0.23.1",
     "serialport": "^12.0.0",
     "typescript": "^5.4.0",
     "usb": "^2.18.0"

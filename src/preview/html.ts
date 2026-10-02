@@ -3,6 +3,7 @@ import { Profile } from '../profiles/types';
 import { qrBitmap } from '../core/bitmap';
 import { barcodeBitmap } from '../core/barcode1d';
 import { bitmapToPng } from './png';
+import { toBase64 } from '../util/base64';
 
 export interface HtmlPreviewOptions {
   /** Wrap in a full document with the receipt styles. Default true. */
@@ -44,8 +45,8 @@ export function opsToHtml(ops: Op[], profile: Profile, options: HtmlPreviewOptio
     for (const p of parts) lines.push(`<div class="l" style="${styleAttr()}">${esc(p) || '&nbsp;'}</div>`);
     pending = '';
   };
-  const img = (png: Buffer, width: number, alt: string) =>
-    lines.push(`<div class="l" style="text-align:${state.align}"><img alt="${esc(alt)}" width="${Math.round((width / profile.dots) * paperPx)}" src="data:image/png;base64,${png.toString('base64')}"></div>`);
+  const img = (png: Uint8Array, width: number, alt: string) =>
+    lines.push(`<div class="l" style="text-align:${state.align}"><img alt="${esc(alt)}" width="${Math.round((width / profile.dots) * paperPx)}" src="data:image/png;base64,${toBase64(png)}"></div>`);
   for (const op of ops) {
     switch (op.kind) {
       case 'text': {

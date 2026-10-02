@@ -17,3 +17,5 @@ export * from './core/barcode1d';
 export * from './template';
 export * from './preview';
 export * from './core/identify';
+export * from './label';
+export { toBase64 } from './util/base64';

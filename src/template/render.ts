@@ -1,5 +1,5 @@
 import { Op } from '../core/ops';
-import { OpBuilder, TableCell } from '../core/printer';
+import { OpBuilder, TableCell } from '../core/builder';
 import { Profile } from '../profiles/types';
 import { Block, Template } from './types';
 import { Scope, evaluate, interpolate, truthy } from './expr';

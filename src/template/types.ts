@@ -1,5 +1,5 @@
 import { BarcodeType } from '../core/ops';
-import { EscposStyle } from '../core/printer';
+import { EscposStyle } from '../core/builder';
 
 export type TAlign = 'left' | 'center' | 'right';
 export type TCellAlign = 'LEFT' | 'CENTER' | 'RIGHT';
@@ -29,5 +29,6 @@ export type Block =
 export interface Template {
   name: string;
   version: 1;
+  kind?: 'receipt';
   blocks: Block[];
 }

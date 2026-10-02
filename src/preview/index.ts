@@ -8,6 +8,6 @@ export { opsToHtml } from './html';
 export type { HtmlPreviewOptions } from './html';
 
 /** PNG of the ops as a bitmap printer would lay them out (needs a canvas, see CanvasRasterizer). */
-export function opsToPng(ops: Op[], profile: Profile, rasterizer: Rasterizer = new CanvasRasterizer()): Buffer {
+export function opsToPng(ops: Op[], profile: Profile, rasterizer: Rasterizer = new CanvasRasterizer()): Uint8Array {
   return bitmapToPng(rasterizer.render(ops, profile));
 }
