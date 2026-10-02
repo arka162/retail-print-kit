@@ -3,7 +3,7 @@ import { Profile } from '../profiles/types';
 import { Transport } from '../transports/types';
 import { encode, EncodeContext } from './encode';
 import { Bitmap, qrBitmap } from './bitmap';
-import { PrinterStatus, parseEscPosStatus, UNSUPPORTED_STATUS } from './status';
+import { PrinterStatus, parseEscPosStatus, parseStarStatus, UNSUPPORTED_STATUS } from './status';
 
 export type EscposAlign = 'lt' | 'ct' | 'rt' | Align;
 export type EscposStyle = 'normal' | 'b' | 'i' | 'u' | 'u2' | 'bi' | 'biu' | 'biu2' | 'bu' | 'bu2' | 'iu' | 'iu2';
@@ -204,6 +204,12 @@ export class Printer extends OpBuilder {
     return this.append(render(template, data, this.profile));
   }
 
+  /** HTML preview of the recorded ops. */
+  toHtml(options?: import('../preview/html').HtmlPreviewOptions): string {
+    const { opsToHtml } = require('../preview/html') as typeof import('../preview/html');
+    return opsToHtml(this.ops, this.profile, options);
+  }
+
   /** The bytes that would be sent for the recorded ops; useful for tests and previews. */
   toBuffer(): Buffer {
     return encode(this.ops, this.profile, this.options);
@@ -214,10 +220,15 @@ export class Printer extends OpBuilder {
    * reply is not mixed with receipt data. Needs a transport with `read`.
    */
   async status(): Promise<PrinterStatus> {
-    if (this.profile.set !== 'escpos') return UNSUPPORTED_STATUS;
+    if (this.profile.set !== 'escpos' && this.profile.set !== 'star-line') return UNSUPPORTED_STATUS;
     if (!this.transport.read) throw new Error(`thermal-print: ${this.transport.name} transport cannot read from the printer`);
     await this.flush();
     const timeout = this.options.statusTimeout ?? 1500;
+    if (this.profile.set === 'star-line') {
+      await this.transport.write(Buffer.from([0x1b, 0x06, 0x01]));
+      const reply = await this.transport.read(timeout);
+      return parseStarStatus(Array.from(reply));
+    }
     const bytes: number[] = [];
     for (const n of [1, 2, 3, 4]) {
       await this.transport.write(Buffer.from([0x10, 0x04, n]));

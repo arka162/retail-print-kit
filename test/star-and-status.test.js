@@ -117,7 +117,7 @@ test('status over TCP: four queries, four replies', async () => {
   }
 });
 
-test('status on Star profiles reports unsupported', async () => {
-  const p = new Printer(new MemoryTransport(), starTsp650, noInit);
+test('status on bitmap-only Star profiles reports unsupported', async () => {
+  const p = new Printer(new MemoryTransport(), starTsp100, noInit);
   assert.equal((await p.status()).supported, false);
 });

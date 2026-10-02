@@ -76,14 +76,21 @@ export class CanvasRasterizer implements Rasterizer {
       } else {
         ctx.fillStyle = '#000';
       }
-      ctx.font = `${s.bold ? 'bold ' : ''}${Math.floor(ch * 0.8)}px ${this.fontFamily}`;
-      const measured = ctx.measureText('M').width || cw;
-      const scaleX = cw / measured;
+      const weight = s.bold ? 'bold ' : '';
+      ctx.font = `${weight}100px ${this.fontFamily}`;
+      const advance = (ctx.measureText('M').width || 60) / 100;
+      const fontSize = Math.floor(Math.min(cw / advance, ch * 0.92));
+      ctx.font = `${weight}${fontSize}px ${this.fontFamily}`;
+      const glyphWidth = ctx.measureText('M').width;
+      const scaleY = Math.max(1, (ch * 0.92) / fontSize);
+      const baseline = it.y + Math.floor((ch - fontSize * scaleY) / 2);
       for (let i = 0; i < it.text.length; i++) {
+        const chr = it.text[i];
+        if (chr === ' ') continue;
         ctx.save();
-        ctx.translate(x0 + i * cw, it.y + Math.floor(ch * 0.08));
-        ctx.scale(scaleX, 1);
-        ctx.fillText(it.text[i], 0, 0);
+        ctx.translate(x0 + i * cw + Math.floor((cw - glyphWidth) / 2), baseline);
+        ctx.scale(1, scaleY);
+        ctx.fillText(chr, 0, 0);
         ctx.restore();
       }
       if (s.underline) {
@@ -92,7 +99,7 @@ export class CanvasRasterizer implements Rasterizer {
       }
     }
     const img = ctx.getImageData(0, 0, width, height);
-    const text = fromRgba(img.data, width, height);
+    const text = fromRgba(img.data, width, height, 170);
     for (let i = 0; i < page.bits.length; i++) page.bits[i] |= text.bits[i];
     return page;
   }

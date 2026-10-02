@@ -42,3 +42,23 @@ export const UNSUPPORTED_STATUS: PrinterStatus = {
   drawerPinHigh: false,
   raw: [],
 };
+
+/**
+ * Parses a Star Line Mode status block (reply to ESC ACK SOH). Bit positions follow the Star Line
+ * Mode command specification as read; verify against a TSP650II / mC-Print before relying on it.
+ */
+export function parseStarStatus(b: number[]): PrinterStatus {
+  const [, printer = 0, error = 0, , paper = 0] = b;
+  return {
+    supported: true,
+    online: (printer & 0x08) === 0,
+    coverOpen: (printer & 0x20) !== 0,
+    drawerPinHigh: (printer & 0x04) !== 0,
+    cutterError: (error & 0x08) !== 0,
+    unrecoverableError: (error & 0x20) !== 0,
+    recoverableError: (error & 0x40) !== 0,
+    paperNearEnd: (paper & 0x04) !== 0,
+    paperOut: (paper & 0x08) !== 0,
+    raw: b,
+  };
+}

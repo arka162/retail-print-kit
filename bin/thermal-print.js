@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 'use strict';
-const { Printer, profiles, profileById, NetTransport } = require('../dist');
+const fs = require('fs');
+const { Printer, profiles, profileById, NetTransport, identify, opsToHtml, opsToPng, OpBuilder } = require('../dist');
 
 process.stdout.on('error', (err) => {
   if (err.code === 'EPIPE') process.exit(0);
@@ -13,6 +14,8 @@ Commands
   test       print a test page (text styles, table, barcode, QR) and show status
   drawer     kick the cash drawer
   status     print the printer status as JSON
+  identify   ask the printer its maker, model and firmware; suggest a profile
+  preview    write the test page as HTML (--out page.html) or PNG (--out page.png)
   profiles   list printer profiles
   list       list USB printers and serial ports
 
@@ -139,6 +142,27 @@ async function main() {
       return withPrinter(args, async (p) => { p.cashdraw(args.pin === '5' ? 5 : 2); });
     case 'status':
       return withPrinter(args, showStatus);
+    case 'identify': {
+      const t = transportFor(args);
+      await t.open();
+      try {
+        const id = await identify(t);
+        console.log(JSON.stringify({ ...id, profile: id.profile ? id.profile.id : null }));
+      } finally {
+        await t.close();
+      }
+      return;
+    }
+    case 'preview': {
+      const profile = profileById(String(args.profile || 'epson-tm-t88'));
+      const out = String(args.out || 'preview.html');
+      const b = new OpBuilder(profile);
+      await testPage(Object.assign(b, { flush: async () => {}, transport: {} }), profile);
+      const ops = b.operations;
+      fs.writeFileSync(out, out.endsWith('.png') ? opsToPng(ops, profile) : opsToHtml(ops, profile));
+      console.log(`wrote ${out}`);
+      return;
+    }
     case 'profiles':
       for (const p of Object.values(profiles)) console.log(`${p.id.padEnd(20)} ${p.set.padEnd(13)} ${p.paper}mm ${String(p.columns.a).padStart(3)} cols  ${p.vendor} ${p.model}`);
       return;

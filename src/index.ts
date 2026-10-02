@@ -15,3 +15,5 @@ export { encodeStarLine } from './core/star-line-encoder';
 export { encodeStarGraphic } from './core/star-graphic-encoder';
 export * from './core/barcode1d';
 export * from './template';
+export * from './preview';
+export * from './core/identify';

@@ -56,12 +56,23 @@ Values use `{{path | filter}}`; filters: `upper`, `lower`, `trim`, `money[:prefi
 `pad:n`, `padEnd:n`, `default:x`, `date[:time|datetime]`, `count`. Inside `each`/`table` rows, `this`,
 `@index` and `@number` refer to the current item.
 
+## Preview and identify
+
+```js
+printer.toHtml();                               // paper-like HTML of the recorded ops
+opsToHtml(ops, profile); opsToPng(ops, profile); // same without a Printer (PNG needs a canvas)
+const id = await identify(transport);           // { maker, model, firmware, set, profile }
+profileForUsb(0x04b8);                          // profile from a USB vendor/product id
+```
+
 ## CLI
 
 ```
 npx thermal-print test --net 192.168.1.50 --profile epson-tm-t20   # test page + status
 npx thermal-print drawer --usb                                     # kick the drawer
 npx thermal-print status --serial /dev/ttyUSB0
+npx thermal-print identify --net 192.168.1.50                      # maker/model/firmware + suggested profile
+npx thermal-print preview --profile star-tsp100 --out page.png     # or .html, no printer needed
 npx thermal-print profiles
 npx thermal-print test --dry --profile star-tsp100 | head -c 200   # bytes only, no printer
 ```
