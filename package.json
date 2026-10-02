@@ -1,0 +1,65 @@
+{
+  "name": "thermal-print",
+  "version": "0.0.1",
+  "description": "Receipt printer and cash drawer driver for Node and Electron: ESC/POS and Star, USB, network and serial, printer profiles, no native dependency in the core.",
+  "author": "Arkaprova Majumder <arka162@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arka162/thermal-print.git"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./net": {
+      "types": "./dist/transports/net.d.ts",
+      "default": "./dist/transports/net.js"
+    },
+    "./usb": {
+      "types": "./dist/transports/usb.d.ts",
+      "default": "./dist/transports/usb.js"
+    },
+    "./serial": {
+      "types": "./dist/transports/serial.d.ts",
+      "default": "./dist/transports/serial.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test test/",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "iconv-lite": "^0.6.3"
+  },
+  "peerDependencies": {
+    "serialport": ">=10",
+    "usb": ">=2"
+  },
+  "peerDependenciesMeta": {
+    "serialport": {
+      "optional": true
+    },
+    "usb": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^18.19.0",
+    "serialport": "^12.0.0",
+    "typescript": "^5.4.0",
+    "usb": "^2.18.0"
+  }
+}
