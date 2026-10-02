@@ -1,5 +1,5 @@
 import net from 'net';
-import { Transport } from './types';
+import { Transport, ReadQueue } from './types';
 
 export interface NetOptions {
   port?: number;
@@ -11,6 +11,7 @@ export interface NetOptions {
 export class NetTransport implements Transport {
   readonly name = 'net';
   private socket: net.Socket | null = null;
+  private readonly inbox = new ReadQueue();
   private readonly port: number;
   private readonly timeout: number;
 
@@ -32,6 +33,8 @@ export class NetTransport implements Transport {
       socket.connect(this.port, this.host, () => {
         socket.removeListener('error', fail);
         socket.setTimeout(0);
+        socket.on('data', (d) => this.inbox.push(Buffer.from(d)));
+        socket.on('error', () => this.inbox.clear());
         this.socket = socket;
         resolve();
       });
@@ -51,9 +54,15 @@ export class NetTransport implements Transport {
     });
   }
 
+  read(timeoutMs: number): Promise<Buffer> {
+    if (!this.socket) return Promise.reject(new Error('thermal-print: net transport is not open'));
+    return this.inbox.next(timeoutMs, `${this.host}:${this.port}`);
+  }
+
   close(): Promise<void> {
     const socket = this.socket;
     this.socket = null;
+    this.inbox.clear();
     if (!socket) return Promise.resolve();
     return new Promise((resolve) => {
       socket.once('close', () => resolve());

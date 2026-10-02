@@ -5,6 +5,12 @@ printer profiles, USB / network / serial transports, no native dependency in the
 
 Status: early development. Not published yet.
 
+* Command sets: ESC/POS (Epson and compatibles), Star Line Mode (TSP650 / mC-Print), Star raster (TSP100 / TSP143).
+* Transports: `thermal-print/net` (raw TCP :9100, no deps), `thermal-print/usb` (needs `usb`), `thermal-print/serial` (needs `serialport`).
+* QR: native where the printer has it, bitmap fallback otherwise. Images: 1-bit `Bitmap` from RGBA.
+* Status: `printer.status()` reads ESC/POS DLE EOT (online, cover, paper, cutter, drawer pin).
+* Bitmap-only printers render through a canvas (`@napi-rs/canvas`, or pass your own factory in Electron).
+
 ```js
 const { Printer, profiles } = require('thermal-print');
 const { NetTransport } = require('thermal-print/net');

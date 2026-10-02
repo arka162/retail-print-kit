@@ -28,6 +28,7 @@ export class UsbTransport implements Transport {
   private usb: UsbModule | null = null;
   private device: import('usb').Device | null = null;
   private endpoint: import('usb').OutEndpoint | null = null;
+  private inEndpoint: import('usb').InEndpoint | null = null;
   private iface: import('usb').Interface | null = null;
   private onDetach: ((d: import('usb').Device) => void) | null = null;
 
@@ -59,6 +60,7 @@ export class UsbTransport implements Transport {
     iface.claim();
     const endpoint = iface.endpoints.find((e) => e.direction === 'out') as import('usb').OutEndpoint | undefined;
     if (!endpoint) throw new Error('thermal-print: USB printer has no OUT endpoint');
+    this.inEndpoint = (iface.endpoints.find((e) => e.direction === 'in') as import('usb').InEndpoint | undefined) ?? null;
     this.device = device;
     this.iface = iface;
     this.endpoint = endpoint;
@@ -81,7 +83,17 @@ export class UsbTransport implements Transport {
     });
   }
 
+  read(timeoutMs: number): Promise<Buffer> {
+    const ep = this.inEndpoint;
+    if (!ep) return Promise.reject(new Error('thermal-print: USB printer has no IN endpoint'));
+    ep.timeout = timeoutMs;
+    return new Promise((resolve, reject) => {
+      ep.transfer(64, (err, data) => (err ? reject(err) : resolve(Buffer.from(data ?? []))));
+    });
+  }
+
   async close(): Promise<void> {
+    this.inEndpoint = null;
     if (this.usb && this.onDetach) this.usb.usb.removeListener('detach', this.onDetach);
     this.onDetach = null;
     const iface = this.iface;

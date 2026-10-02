@@ -11,9 +11,9 @@ As of 2026-10-02. "Set" is the command set the profile speaks. Columns are at th
 | Epson TM-T20III | escpos | 80 | 42/48 | USB, Ethernet, serial | DK | Budget T88; same commands. | |
 | Epson TM-m30II / m30III | escpos | 80/58 | 42/48 | USB, Ethernet, BT, Wi-Fi | DK | mPOS style; ePOS also available but not needed. | |
 | Epson TM-U220 | escpos (impact) | 76 | 33/40 | USB, Ethernet, serial | DK | Kitchen printer; no raster, no QR, two-colour ribbon. | |
-| Star TSP143III / TSP100 series | star-graphic | 80 | n/a | USB, LAN, BT | DK (Star pulse) | Text must be rendered to bitmap. Most common Square/Shopify printer. | |
-| Star TSP654II / TSP700II | star-line | 80 | 42/48 | USB, LAN, serial | DK | Star Line Mode; ESC/POS emulation can be switched on by DIP/config. | |
-| Star mC-Print3 / mC-Print2 | star-line + escpos | 80/58 | 48/32 | USB, LAN, BT, CloudPRNT | DK | Ships in Star mode, ESC/POS selectable. | |
+| Star TSP143III / TSP100 series | star-graphic | 80 | n/a | USB, LAN, BT | DK (Star pulse) | Text must be rendered to bitmap. Most common Square/Shopify printer. Profile `star-tsp100`; EOT cut-mode bytes need hardware verification. | |
+| Star TSP654II / TSP700II | star-line | 80 | 42/48 | USB, LAN, serial | DK | Star Line Mode; ESC/POS emulation can be switched on by DIP/config. Profile `star-tsp650`. | |
+| Star mC-Print3 / mC-Print2 | star-line + escpos | 80/58 | 48/32 | USB, LAN, BT, CloudPRNT | DK | Ships in Star mode, ESC/POS selectable. Profile `star-mc-print3`. | |
 | Bixolon SRP-350III / SRP-350plusIII | escpos | 80 | 42/48 | USB, Ethernet, serial | DK | Epson-compatible with Bixolon extras. | |
 | Citizen CT-S310II / CT-S4000 | escpos | 80 | 42/48 | USB, Ethernet, serial | DK | Epson-compatible. | |
 | SNBC BTP-R880NP | escpos | 80 | 42/48 | USB, Ethernet, serial | DK | Epson-compatible, common in C-stores. | |

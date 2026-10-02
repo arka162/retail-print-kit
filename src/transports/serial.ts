@@ -1,4 +1,4 @@
-import { Transport } from './types';
+import { Transport, ReadQueue } from './types';
 
 export interface SerialOptions {
   baudRate?: number;
@@ -20,6 +20,7 @@ function loadSerial(): SerialPortCtor {
 export class SerialTransport implements Transport {
   readonly name = 'serial';
   private port: InstanceType<SerialPortCtor> | null = null;
+  private readonly inbox = new ReadQueue();
 
   constructor(public readonly path: string, private readonly options: SerialOptions = {}) {}
 
@@ -34,6 +35,7 @@ export class SerialTransport implements Transport {
     return new Promise((resolve, reject) => {
       const port = new SerialPort({ path: this.path, baudRate: this.options.baudRate ?? 9600 }, (err) => {
         if (err) return reject(err);
+        port.on('data', (d: Buffer) => this.inbox.push(Buffer.from(d)));
         this.port = port;
         resolve();
       });
@@ -58,9 +60,15 @@ export class SerialTransport implements Transport {
     });
   }
 
+  read(timeoutMs: number): Promise<Buffer> {
+    if (!this.port) return Promise.reject(new Error('thermal-print: serial transport is not open'));
+    return this.inbox.next(timeoutMs, this.path);
+  }
+
   close(): Promise<void> {
     const port = this.port;
     this.port = null;
+    this.inbox.clear();
     if (!port || !port.isOpen) return Promise.resolve();
     return new Promise((resolve, reject) => port.close((err) => (err ? reject(err) : resolve())));
   }
