@@ -34,49 +34,23 @@ export interface PrinterOptions extends EncodeContext {
 const ALIGN: Record<string, Align> = { lt: 'left', ct: 'center', rt: 'right', left: 'left', center: 'center', right: 'right' };
 
 /**
- * Records print operations and sends them as one buffer. Method names match the `escpos`
- * package so a host can swap the device without rewriting its receipt code.
+ * Records print operations. Method names match the `escpos` package so a host can swap the
+ * device without rewriting its receipt code. Nothing is sent from here; see `Printer`.
  */
-export class Printer {
-  private ops: Op[] = [];
-  private font: Font = 'a';
-  private opened = false;
+export class OpBuilder {
+  protected ops: Op[] = [];
+  protected font: Font = 'a';
 
-  constructor(
-    public readonly transport: Transport,
-    public readonly profile: Profile,
-    private readonly options: PrinterOptions = {},
-  ) {}
+  constructor(public readonly profile: Profile) {}
 
-  async open(): Promise<this> {
-    await this.transport.open();
-    this.opened = true;
-    if (this.options.initOnOpen !== false) this.ops.unshift({ kind: 'init' });
+  /** A copy of the recorded ops. */
+  get operations(): Op[] {
+    return this.ops.slice();
+  }
+
+  append(ops: Op[]): this {
+    for (const op of ops) this.ops.push(op);
     return this;
-  }
-
-  /** Encodes and sends everything recorded so far, keeping the connection open. */
-  async flush(): Promise<this> {
-    if (!this.opened) throw new Error('thermal-print: call open() before flush()');
-    const ops = this.ops;
-    this.ops = [];
-    if (ops.length) await this.transport.write(encode(ops, this.profile, this.options));
-    return this;
-  }
-
-  /** Flushes, then closes the transport. */
-  async close(): Promise<void> {
-    try {
-      await this.flush();
-    } finally {
-      this.opened = false;
-      await this.transport.close();
-    }
-  }
-
-  /** The bytes that would be sent for the recorded ops; useful for tests and previews. */
-  toBuffer(): Buffer {
-    return encode(this.ops, this.profile, this.options);
   }
 
   get columns(): number {
@@ -159,23 +133,6 @@ export class Printer {
     return this.push({ kind: 'raster', width: bitmap.width, height: bitmap.height, bits: bitmap.bits });
   }
 
-  /**
-   * Asks the printer for its state (ESC/POS DLE EOT 1..4). Flushes pending ops first so the
-   * reply is not mixed with receipt data. Needs a transport with `read`.
-   */
-  async status(): Promise<PrinterStatus> {
-    if (this.profile.set !== 'escpos') return UNSUPPORTED_STATUS;
-    if (!this.transport.read) throw new Error(`thermal-print: ${this.transport.name} transport cannot read from the printer`);
-    await this.flush();
-    const timeout = this.options.statusTimeout ?? 1500;
-    const bytes: number[] = [];
-    for (const n of [1, 2, 3, 4]) {
-      await this.transport.write(Buffer.from([0x10, 0x04, n]));
-      const reply = await this.transport.read(timeout);
-      bytes.push(reply[0]);
-    }
-    return parseEscPosStatus(bytes);
-  }
 
   /** `escpos` name for a QR code; prints a native QR when the profile has one. */
   qrimage(data: string, options: QrOptions = {}): this {
@@ -200,6 +157,74 @@ export class Printer {
       this.text(line.replace(/\s+$/, ''));
     }
     return this;
+  }
+}
+
+/** An `OpBuilder` bound to a transport: `open()`, record ops, `close()` sends them. */
+export class Printer extends OpBuilder {
+  private opened = false;
+
+  constructor(
+    public readonly transport: Transport,
+    profile: Profile,
+    private readonly options: PrinterOptions = {},
+  ) {
+    super(profile);
+  }
+
+  async open(): Promise<this> {
+    await this.transport.open();
+    this.opened = true;
+    if (this.options.initOnOpen !== false) this.ops.unshift({ kind: 'init' });
+    return this;
+  }
+
+  /** Encodes and sends everything recorded so far, keeping the connection open. */
+  async flush(): Promise<this> {
+    if (!this.opened) throw new Error('thermal-print: call open() before flush()');
+    const ops = this.ops;
+    this.ops = [];
+    if (ops.length) await this.transport.write(encode(ops, this.profile, this.options));
+    return this;
+  }
+
+  /** Flushes, then closes the transport. */
+  async close(): Promise<void> {
+    try {
+      await this.flush();
+    } finally {
+      this.opened = false;
+      await this.transport.close();
+    }
+  }
+
+  /** Renders a template with data and appends the result. */
+  render(template: import('../template/types').Template, data: unknown): this {
+    const { render } = require('../template/render') as typeof import('../template/render');
+    return this.append(render(template, data, this.profile));
+  }
+
+  /** The bytes that would be sent for the recorded ops; useful for tests and previews. */
+  toBuffer(): Buffer {
+    return encode(this.ops, this.profile, this.options);
+  }
+
+  /**
+   * Asks the printer for its state (ESC/POS DLE EOT 1..4). Flushes pending ops first so the
+   * reply is not mixed with receipt data. Needs a transport with `read`.
+   */
+  async status(): Promise<PrinterStatus> {
+    if (this.profile.set !== 'escpos') return UNSUPPORTED_STATUS;
+    if (!this.transport.read) throw new Error(`thermal-print: ${this.transport.name} transport cannot read from the printer`);
+    await this.flush();
+    const timeout = this.options.statusTimeout ?? 1500;
+    const bytes: number[] = [];
+    for (const n of [1, 2, 3, 4]) {
+      await this.transport.write(Buffer.from([0x10, 0x04, n]));
+      const reply = await this.transport.read(timeout);
+      bytes.push(reply[0]);
+    }
+    return parseEscPosStatus(bytes);
   }
 }
 

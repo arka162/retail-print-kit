@@ -1,6 +1,7 @@
 import { Op, Align, Font } from './ops';
 import { Profile } from '../profiles/types';
 import { Bitmap, blit, emptyBitmap, fitWidth, fromRgba, qrBitmap } from './bitmap';
+import { barcodeBitmap } from './barcode1d';
 
 /** Turns text ops into a page image for printers that only accept bitmaps (Star TSP100). */
 export interface Rasterizer {
@@ -167,8 +168,18 @@ function layout(ops: Op[], profile: Profile): Item[] {
         y += bm.height;
         break;
       }
-      case 'barcode':
-        throw new Error('thermal-print: 1D barcodes on bitmap-only printers are not implemented yet');
+      case 'barcode': {
+        flushLine(false);
+        const bm = barcodeBitmap(op.type, op.data, op.options.width ?? 2, op.options.height ?? 80);
+        items.push({ type: 'bitmap', bitmap: bm, align: state.align, y, height: bm.height });
+        y += bm.height;
+        const pos = op.options.position ?? 'below';
+        if (pos === 'below' || pos === 'both') {
+          pending = op.data;
+          flushLine(true);
+        }
+        break;
+      }
       case 'cut':
         flushLine(false);
         if (op.feed > 0) {

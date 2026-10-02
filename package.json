@@ -30,6 +30,7 @@
   },
   "files": [
     "dist",
+    "bin",
     "README.md",
     "LICENSE"
   ],
@@ -65,5 +66,8 @@
     "serialport": "^12.0.0",
     "typescript": "^5.4.0",
     "usb": "^2.18.0"
+  },
+  "bin": {
+    "thermal-print": "./bin/thermal-print.js"
   }
 }

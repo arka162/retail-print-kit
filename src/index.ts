@@ -13,3 +13,5 @@ export type { Rasterizer, CanvasFactory } from './core/rasterizer';
 export type { EncodeContext } from './core/encode';
 export { encodeStarLine } from './core/star-line-encoder';
 export { encodeStarGraphic } from './core/star-graphic-encoder';
+export * from './core/barcode1d';
+export * from './template';
