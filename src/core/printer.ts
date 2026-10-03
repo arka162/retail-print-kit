@@ -34,7 +34,7 @@ export class Printer extends OpBuilder {
 
   /** Encodes and sends everything recorded so far, keeping the connection open. */
   async flush(): Promise<this> {
-    if (!this.opened) throw new Error('thermal-print: call open() before flush()');
+    if (!this.opened) throw new Error('retail-print-kit: call open() before flush()');
     const ops = this.ops;
     this.ops = [];
     if (ops.length) await this.transport.write(encode(ops, this.profile, this.options));
@@ -74,7 +74,7 @@ export class Printer extends OpBuilder {
    */
   async status(): Promise<PrinterStatus> {
     if (this.profile.set !== 'escpos' && this.profile.set !== 'star-line') return UNSUPPORTED_STATUS;
-    if (!this.transport.read) throw new Error(`thermal-print: ${this.transport.name} transport cannot read from the printer`);
+    if (!this.transport.read) throw new Error(`retail-print-kit: ${this.transport.name} transport cannot read from the printer`);
     await this.flush();
     const timeout = this.options.statusTimeout ?? 1500;
     if (this.profile.set === 'star-line') {

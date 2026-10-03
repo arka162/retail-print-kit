@@ -28,7 +28,7 @@ export class ReadQueue {
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
         this.waiters = this.waiters.filter((x) => x.timer !== timer);
-        reject(new Error(`thermal-print: timeout waiting for ${what}`));
+        reject(new Error(`retail-print-kit: timeout waiting for ${what}`));
       }, timeoutMs);
       this.waiters.push({ resolve, reject, timer });
     });
@@ -38,7 +38,7 @@ export class ReadQueue {
     this.chunks = [];
     for (const w of this.waiters) {
       clearTimeout(w.timer);
-      w.reject(new Error('thermal-print: transport closed'));
+      w.reject(new Error('retail-print-kit: transport closed'));
     }
     this.waiters = [];
   }

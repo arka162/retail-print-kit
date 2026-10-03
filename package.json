@@ -1,5 +1,5 @@
 {
-  "name": "thermal-print",
+  "name": "retail-print-kit",
   "version": "0.1.0",
   "description": "Receipt printer and cash drawer driver for Node and Electron: ESC/POS and Star, USB, network and serial, printer profiles, no native dependency in the core.",
   "author": "Arkaprova Majumder <arka162@gmail.com>",
@@ -29,8 +29,8 @@
     },
     "./browser": {
       "types": "./dist/browser.d.ts",
-      "import": "./dist/browser/thermal-print.mjs",
-      "default": "./dist/browser/thermal-print.js"
+      "import": "./dist/browser/retail-print-kit.mjs",
+      "default": "./dist/browser/retail-print-kit.js"
     }
   },
   "files": [
@@ -46,7 +46,7 @@
     "build": "tsc -p tsconfig.json && npm run build:browser",
     "test": "npm run build && node --test test/run.js",
     "clean": "rm -rf dist",
-    "build:browser": "esbuild src/browser.ts --bundle --format=iife --global-name=ThermalPrint --platform=browser --external:zlib --outfile=dist/browser/thermal-print.js --minify --sourcemap && esbuild src/browser.ts --bundle --format=esm --platform=browser --external:zlib --outfile=dist/browser/thermal-print.mjs --minify",
+    "build:browser": "esbuild src/browser.ts --bundle --format=iife --global-name=RetailPrintKit --platform=browser --external:zlib --outfile=dist/browser/retail-print-kit.js --minify --sourcemap && esbuild src/browser.ts --bundle --format=esm --platform=browser --external:zlib --outfile=dist/browser/retail-print-kit.mjs --minify",
     "prepublishOnly": "npm test"
   },
   "dependencies": {
@@ -76,7 +76,7 @@
     "usb": "^2.18.0"
   },
   "bin": {
-    "thermal-print": "./bin/thermal-print.js"
+    "retail-print-kit": "./bin/retail-print-kit.js"
   },
   "homepage": "https://github.com/arka162/thermal-print#readme",
   "bugs": {

@@ -105,12 +105,12 @@ export function encodeEscPos(ops: Op[], profile: Profile): Buffer {
       }
       case 'qr':
         if (!profile.features.nativeQr) {
-          throw new Error(`thermal-print: profile ${profile.id} has no native QR; raster QR is not implemented yet`);
+          throw new Error(`retail-print-kit: profile ${profile.id} has no native QR; raster QR is not implemented yet`);
         }
         pushQr(out, op.data, op.options);
         break;
       case 'raster': {
-        if (!profile.features.raster) throw new Error(`thermal-print: profile ${profile.id} cannot print raster images`);
+        if (!profile.features.raster) throw new Error(`retail-print-kit: profile ${profile.id} cannot print raster images`);
         const bytesPerRow = Math.ceil(op.width / 8);
         out.push([GS, 0x76, 0x30, 0, bytesPerRow & 0xff, bytesPerRow >> 8, op.height & 0xff, op.height >> 8], op.bits);
         break;

@@ -34,7 +34,7 @@ function op(o: LabelOp, dpi: number): Uint8Array | string {
     }
     case 'barcode': {
       const code = BARCODE[o.type];
-      if (!code) throw new Error(`thermal-print: TSPL has no ${o.type}`);
+      if (!code) throw new Error(`retail-print-kit: TSPL has no ${o.type}`);
       const narrow = o.module ?? 2;
       return `BARCODE ${x},${y},"${code}",${Math.round(o.height)},${o.text === false ? 0 : 1},${rot(o.rotation)},${narrow},${narrow * 2},${q(o.data)}`;
     }

@@ -23,7 +23,7 @@ export interface LabelTemplate {
 }
 
 export function renderLabel(template: LabelTemplate, data: unknown): Label {
-  if (template.version !== 1 || template.kind !== 'label') throw new Error('thermal-print: not a version 1 label template');
+  if (template.version !== 1 || template.kind !== 'label') throw new Error('retail-print-kit: not a version 1 label template');
   const b = new LabelBuilder({ widthMm: template.widthMm, heightMm: template.heightMm, dpi: template.dpi, gapMm: template.gapMm });
   const scope: Scope = { root: data, current: data };
   for (const e of template.elements) {

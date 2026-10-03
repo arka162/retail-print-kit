@@ -8,7 +8,7 @@ const ALIGN = { left: 'lt', center: 'ct', right: 'rt' } as const;
 
 /** Renders a template with data into ops for the given profile. */
 export function render(template: Template, data: unknown, profile: Profile): Op[] {
-  if (template.version !== 1) throw new Error(`thermal-print: unsupported template version ${String(template.version)}`);
+  if (template.version !== 1) throw new Error(`retail-print-kit: unsupported template version ${String(template.version)}`);
   const b = new OpBuilder(profile);
   renderBlocks(template.blocks, { root: data, current: data }, b);
   return b.operations;
@@ -90,6 +90,6 @@ function renderBlock(block: Block, scope: Scope, b: OpBuilder): void {
       else if (block.else) renderBlocks(block.else, scope, b);
       break;
     default:
-      throw new Error(`thermal-print: unknown template block "${(block as { type: string }).type}"`);
+      throw new Error(`retail-print-kit: unknown template block "${(block as { type: string }).type}"`);
   }
 }

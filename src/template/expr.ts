@@ -65,7 +65,7 @@ export function evaluate(expression: string, scope: Scope): unknown {
     const name = idx === -1 ? pipe : pipe.slice(0, idx);
     const arg = idx === -1 ? undefined : pipe.slice(idx + 1);
     const f = filters[name];
-    if (!f) throw new Error(`thermal-print: unknown template filter "${name}"`);
+    if (!f) throw new Error(`retail-print-kit: unknown template filter "${name}"`);
     value = f(value, arg);
   }
   return value;

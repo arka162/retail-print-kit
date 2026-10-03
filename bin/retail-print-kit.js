@@ -8,7 +8,7 @@ process.stdout.on('error', (err) => {
   throw err;
 });
 
-const USAGE = `thermal-print <command> [options]
+const USAGE = `retail-print-kit <command> [options]
 
 Commands
   test       print a test page (text styles, table, barcode, QR) and show status
@@ -32,9 +32,9 @@ Options
   --dry                      print the bytes as hex instead of sending
 
 Examples
-  thermal-print test --net 192.168.1.50 --profile epson-tm-t20
-  thermal-print drawer --usb
-  thermal-print status --serial /dev/ttyUSB0`;
+  retail-print-kit test --net 192.168.1.50 --profile epson-tm-t20
+  retail-print-kit drawer --usb
+  retail-print-kit status --serial /dev/ttyUSB0`;
 
 function parse(argv) {
   const args = { _: [] };
@@ -98,7 +98,7 @@ async function withPrinter(args, fn) {
 async function testPage(printer, profile) {
   const now = new Date();
   printer
-    .align('ct').style('b').size(2, 2).text('thermal-print').size(1, 1).style('normal')
+    .align('ct').style('b').size(2, 2).text('retail-print-kit').size(1, 1).style('normal')
     .text(`${profile.vendor} ${profile.model}`)
     .text(`profile ${profile.id} / ${profile.set} / ${profile.columns.a} cols`)
     .text(now.toLocaleString())

@@ -31,7 +31,7 @@ function op(o: LabelOp): string {
     }
     case 'barcode': {
       const code = BARCODE[o.type];
-      if (!code) throw new Error(`thermal-print: EZPL has no ${o.type}`);
+      if (!code) throw new Error(`retail-print-kit: EZPL has no ${o.type}`);
       const narrow = o.module ?? 2;
       return `B${code},${x},${y},${narrow},${narrow * 2},${Math.round(o.height)},${rot / 90},${o.text === false ? 0 : 1},${o.data}`;
     }
@@ -44,7 +44,7 @@ function op(o: LabelOp): string {
     case 'rect':
       return `R${x},${y},${x + Math.round(o.width)},${y + Math.round(o.height)},${Math.round(o.width)},${Math.round(o.height)}`;
     case 'image':
-      throw new Error('thermal-print: EZPL images are not implemented yet');
+      throw new Error('retail-print-kit: EZPL images are not implemented yet');
   }
 }
 

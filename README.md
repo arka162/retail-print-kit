@@ -1,4 +1,4 @@
-# thermal-print
+# retail-print-kit
 
 Receipt printer and cash drawer driver for Node and Electron. ESC/POS and Star command sets,
 printer profiles, USB / network / serial transports, no native dependency in the core.
@@ -7,15 +7,15 @@ Status: early development. Not published yet.
 
 * Receipt command sets: ESC/POS (Epson and compatibles), Star Line Mode (TSP650 / mC-Print), Star raster (TSP100 / TSP143).
 * Label languages: ZPL (Zebra), TSPL (TSC, Xprinter, Rongta), EZPL (Godex).
-* Browser bundle (`thermal-print/browser`) with templates, previews and label encoders; a designer app in `apps/designer`.
-* Transports: `thermal-print/net` (raw TCP :9100, no deps), `thermal-print/usb` (needs `usb`), `thermal-print/serial` (needs `serialport`).
+* Browser bundle (`retail-print-kit/browser`) with templates, previews and label encoders; a designer app in `apps/designer`.
+* Transports: `retail-print-kit/net` (raw TCP :9100, no deps), `retail-print-kit/usb` (needs `usb`), `retail-print-kit/serial` (needs `serialport`).
 * QR: native where the printer has it, bitmap fallback otherwise. Images: 1-bit `Bitmap` from RGBA.
 * Status: `printer.status()` reads ESC/POS DLE EOT (online, cover, paper, cutter, drawer pin).
 * Bitmap-only printers render through a canvas (`@napi-rs/canvas`, or pass your own factory in Electron).
 
 ```js
-const { Printer, profiles } = require('thermal-print');
-const { NetTransport } = require('thermal-print/net');
+const { Printer, profiles } = require('retail-print-kit');
+const { NetTransport } = require('retail-print-kit/net');
 
 const printer = new Printer(new NetTransport('192.168.1.50'), profiles.epsonTmT88);
 await printer.open();
@@ -33,7 +33,7 @@ await printer.close();
 A receipt can be a JSON layout rendered with data, which is what a visual designer will produce:
 
 ```js
-const { render } = require('thermal-print');
+const { render } = require('retail-print-kit');
 const template = {
   name: 'receipt', version: 1,
   blocks: [
@@ -64,7 +64,7 @@ Labels are positioned elements on a fixed page, encoded for Zebra (ZPL), TSC and
 Godex (EZPL). Positions are in dots at the label's dpi; `mm()` converts.
 
 ```js
-const { LabelBuilder, encodeZpl, encodeTspl, encodeEzpl, labelToSvg, renderLabel } = require('thermal-print');
+const { LabelBuilder, encodeZpl, encodeTspl, encodeEzpl, labelToSvg, renderLabel } = require('retail-print-kit');
 const b = new LabelBuilder({ widthMm: 50.8, heightMm: 25.4, dpi: 203 });
 b.text(18, 14, 'Coffee Beans 1lb', 26).text(92, 65, '$12.99', 85, { bold: true })
  .barcode(35, 140, '036000291452', 'UPC_A', 35).qr(330, 20, 'https://x.io/i/1', { module: 3 });
@@ -91,15 +91,15 @@ profileForUsb(0x04b8);                          // profile from a USB vendor/pro
 ## CLI
 
 ```
-npx thermal-print test --net 192.168.1.50 --profile epson-tm-t20   # test page + status
-npx thermal-print drawer --usb                                     # kick the drawer
-npx thermal-print status --serial /dev/ttyUSB0
-npx thermal-print identify --net 192.168.1.50                      # maker/model/firmware + suggested profile
-npx thermal-print preview --profile star-tsp100 --out page.png     # or .html, no printer needed
-npx thermal-print print --template receipt.json --data sale.json --net 192.168.1.50
-npx thermal-print print --template shelf.json --data item.json --language zpl --net 192.168.1.60
-npx thermal-print profiles
-npx thermal-print test --dry --profile star-tsp100 | head -c 200   # bytes only, no printer
+npx retail-print-kit test --net 192.168.1.50 --profile epson-tm-t20   # test page + status
+npx retail-print-kit drawer --usb                                     # kick the drawer
+npx retail-print-kit status --serial /dev/ttyUSB0
+npx retail-print-kit identify --net 192.168.1.50                      # maker/model/firmware + suggested profile
+npx retail-print-kit preview --profile star-tsp100 --out page.png     # or .html, no printer needed
+npx retail-print-kit print --template receipt.json --data sale.json --net 192.168.1.50
+npx retail-print-kit print --template shelf.json --data item.json --language zpl --net 192.168.1.60
+npx retail-print-kit profiles
+npx retail-print-kit test --dry --profile star-tsp100 | head -c 200   # bytes only, no printer
 ```
 
 Docs: [ADR 0001](docs/adr/0001-replace-escpos.md), [printer matrix](docs/printer-matrix.md).

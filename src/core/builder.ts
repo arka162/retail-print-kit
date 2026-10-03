@@ -75,7 +75,7 @@ export class OpBuilder {
 
   align(align: EscposAlign): this {
     const a = ALIGN[align];
-    if (!a) throw new Error(`thermal-print: unknown align "${align}"`);
+    if (!a) throw new Error(`retail-print-kit: unknown align "${align}"`);
     return this.push({ kind: 'align', align: a });
   }
 

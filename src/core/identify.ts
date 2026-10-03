@@ -37,7 +37,7 @@ export function profileForModel(maker: string | null, model: string | null): Pro
 }
 
 async function ask(transport: Transport, bytes: number[], timeoutMs: number): Promise<Buffer | null> {
-  if (!transport.read) throw new Error(`thermal-print: ${transport.name} transport cannot read from the printer`);
+  if (!transport.read) throw new Error(`retail-print-kit: ${transport.name} transport cannot read from the printer`);
   await transport.write(Buffer.from(bytes));
   try {
     return await transport.read(timeoutMs);

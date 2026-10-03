@@ -212,6 +212,6 @@ export function loadCanvasFactory(): CanvasFactory {
     }
   }
   return () => {
-    throw new Error('thermal-print: bitmap printers need a canvas; install @napi-rs/canvas or pass a CanvasFactory');
+    throw new Error('retail-print-kit: bitmap printers need a canvas; install @napi-rs/canvas or pass a CanvasFactory');
   };
 }

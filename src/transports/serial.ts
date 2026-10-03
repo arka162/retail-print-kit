@@ -12,7 +12,7 @@ function loadSerial(): SerialPortCtor {
   try {
     return require('serialport').SerialPort;
   } catch (err) {
-    throw new Error('thermal-print: the "serialport" package is not installed; run `npm install serialport` to print over serial');
+    throw new Error('retail-print-kit: the "serialport" package is not installed; run `npm install serialport` to print over serial');
   }
 }
 
@@ -44,9 +44,9 @@ export class SerialTransport implements Transport {
 
   write(bytes: Buffer): Promise<void> {
     const port = this.port;
-    if (!port) return Promise.reject(new Error('thermal-print: serial transport is not open'));
+    if (!port) return Promise.reject(new Error('retail-print-kit: serial transport is not open'));
     return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error(`thermal-print: timeout writing to ${this.path}`)), this.options.timeout ?? 5000);
+      const timer = setTimeout(() => reject(new Error(`retail-print-kit: timeout writing to ${this.path}`)), this.options.timeout ?? 5000);
       port.write(bytes, (err) => {
         if (err) {
           clearTimeout(timer);
@@ -61,7 +61,7 @@ export class SerialTransport implements Transport {
   }
 
   read(timeoutMs: number): Promise<Buffer> {
-    if (!this.port) return Promise.reject(new Error('thermal-print: serial transport is not open'));
+    if (!this.port) return Promise.reject(new Error('retail-print-kit: serial transport is not open'));
     return this.inbox.next(timeoutMs, this.path);
   }
 

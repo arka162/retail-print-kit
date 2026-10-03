@@ -28,7 +28,7 @@ function op(o: LabelOp): string {
     }
     case 'barcode': {
       const code = BARCODE[o.type];
-      if (!code) throw new Error(`thermal-print: ZPL has no ${o.type}`);
+      if (!code) throw new Error(`retail-print-kit: ZPL has no ${o.type}`);
       const hri = o.text === false ? 'N' : 'Y';
       const extra = o.type === 'CODE128' ? `,${hri},N,N` : `,${hri},N`;
       return `${at}^BY${o.module ?? 2},2,${Math.round(o.height)}^${code}${ROT[o.rotation ?? 0]},${Math.round(o.height)}${extra}^FD${fd(o.data)}^FS`;

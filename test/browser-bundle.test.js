@@ -5,12 +5,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 test('browser bundle runs without Node globals and renders both kinds', () => {
-  const src = fs.readFileSync(path.join(__dirname, '..', 'dist', 'browser', 'thermal-print.js'), 'utf8');
+  const src = fs.readFileSync(path.join(__dirname, '..', 'dist', 'browser', 'retail-print-kit.js'), 'utf8');
   const ctx = { TextEncoder, TextDecoder, console };
   ctx.window = ctx;
   vm.createContext(ctx);
   vm.runInContext(src, ctx);
-  const T = ctx.ThermalPrint;
+  const T = ctx.RetailPrintKit;
   assert.ok(T.render && T.renderLabel && T.opsToHtml && T.labelToSvg && T.encodeZpl && T.encodeTspl && T.encodeEzpl);
   const ops = T.render({ name: 'r', version: 1, blocks: [{ type: 'text', value: '{{a}}' }, { type: 'qr', value: 'x' }] }, { a: 'hi' }, T.epsonTmT88);
   const html = T.opsToHtml(ops, T.epsonTmT88);

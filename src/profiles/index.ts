@@ -11,6 +11,6 @@ export const profiles: Record<string, Profile> = Object.fromEntries(
 
 export function profileById(id: string): Profile {
   const p = profiles[id];
-  if (!p) throw new Error(`thermal-print: unknown profile "${id}"`);
+  if (!p) throw new Error(`retail-print-kit: unknown profile "${id}"`);
   return p;
 }

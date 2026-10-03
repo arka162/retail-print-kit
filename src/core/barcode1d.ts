@@ -24,7 +24,7 @@ const C128_CODE_C = 99;
 const C128_STOP = 106;
 
 export function code128(data: string): Pattern {
-  if (!/^[\x20-\x7e]*$/.test(data) || !data.length) throw new Error('thermal-print: CODE128 needs printable ASCII');
+  if (!/^[\x20-\x7e]*$/.test(data) || !data.length) throw new Error('retail-print-kit: CODE128 needs printable ASCII');
   const codes: number[] = [];
   let i = 0;
   let subset: 'B' | 'C' | null = null;
@@ -97,7 +97,7 @@ function bitsToPattern(bits: string): Pattern {
 export function ean13(data: string): Pattern {
   let d = data.replace(/\D/g, '');
   if (d.length === 12) d += eanChecksum(d);
-  if (d.length !== 13) throw new Error('thermal-print: EAN13 needs 12 or 13 digits');
+  if (d.length !== 13) throw new Error('retail-print-kit: EAN13 needs 12 or 13 digits');
   const parity = EAN13_PARITY[Number(d[0])];
   let bits = '101';
   for (let i = 1; i <= 6; i++) bits += (parity[i - 1] === 'L' ? EAN_L : EAN_G)[Number(d[i])];
@@ -110,14 +110,14 @@ export function ean13(data: string): Pattern {
 export function upcA(data: string): Pattern {
   let d = data.replace(/\D/g, '');
   if (d.length === 11) d += eanChecksum(d);
-  if (d.length !== 12) throw new Error('thermal-print: UPC-A needs 11 or 12 digits');
+  if (d.length !== 12) throw new Error('retail-print-kit: UPC-A needs 11 or 12 digits');
   return ean13('0' + d);
 }
 
 export function ean8(data: string): Pattern {
   let d = data.replace(/\D/g, '');
   if (d.length === 7) d += eanChecksum(d);
-  if (d.length !== 8) throw new Error('thermal-print: EAN8 needs 7 or 8 digits');
+  if (d.length !== 8) throw new Error('retail-print-kit: EAN8 needs 7 or 8 digits');
   let bits = '101';
   for (let i = 0; i < 4; i++) bits += EAN_L[Number(d[i])];
   bits += '01010';
@@ -143,7 +143,7 @@ export function code39(data: string): Pattern {
   let bits = '';
   for (const ch of text) {
     const p = CODE39[ch];
-    if (!p) throw new Error(`thermal-print: CODE39 cannot encode "${ch}"`);
+    if (!p) throw new Error(`retail-print-kit: CODE39 cannot encode "${ch}"`);
     bits += p + '0';
   }
   return bitsToPattern(bits.slice(0, -1));
@@ -157,7 +157,7 @@ export function pattern(type: BarcodeType, data: string): Pattern {
     case 'EAN8': return ean8(data);
     case 'CODE39': return code39(data);
     default:
-      throw new Error(`thermal-print: bitmap rendering of ${type} is not implemented`);
+      throw new Error(`retail-print-kit: bitmap rendering of ${type} is not implemented`);
   }
 }
 

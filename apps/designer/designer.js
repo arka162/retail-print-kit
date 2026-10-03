@@ -1,9 +1,9 @@
-/* thermal-print designer: builds receipt or label templates and previews them live. */
+/* retail-print-kit designer: builds receipt or label templates and previews them live. */
 (function () {
   'use strict';
-  const T = window.ThermalPrint;
+  const T = window.RetailPrintKit;
   const $ = (id) => document.getElementById(id);
-  const STORAGE = 'thermal-print-designer';
+  const STORAGE = 'retail-print-kit-designer';
 
   const SAMPLE_RECEIPT = {
     id: 'A1042', date: new Date().toISOString(),

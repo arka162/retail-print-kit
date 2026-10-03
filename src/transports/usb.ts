@@ -15,7 +15,7 @@ function loadUsb(): UsbModule {
   try {
     return require('usb');
   } catch (err) {
-    throw new Error('thermal-print: the "usb" package is not installed; run `npm install usb` to print over USB');
+    throw new Error('retail-print-kit: the "usb" package is not installed; run `npm install usb` to print over USB');
   }
 }
 
@@ -46,10 +46,10 @@ export class UsbTransport implements Transport {
     const usb = loadUsb();
     this.usb = usb;
     const device = usb.getDeviceList().find((d) => isPrinter(d, this.options));
-    if (!device) throw new Error('thermal-print: no USB printer found');
+    if (!device) throw new Error('retail-print-kit: no USB printer found');
     device.open();
     const iface = device.interfaces?.find((i) => i.descriptor.bInterfaceClass === USB_CLASS_PRINTER) ?? device.interfaces?.[0];
-    if (!iface) throw new Error('thermal-print: USB printer has no interface');
+    if (!iface) throw new Error('retail-print-kit: USB printer has no interface');
     if (process.platform !== 'win32' && iface.isKernelDriverActive()) {
       try {
         iface.detachKernelDriver();
@@ -59,7 +59,7 @@ export class UsbTransport implements Transport {
     }
     iface.claim();
     const endpoint = iface.endpoints.find((e) => e.direction === 'out') as import('usb').OutEndpoint | undefined;
-    if (!endpoint) throw new Error('thermal-print: USB printer has no OUT endpoint');
+    if (!endpoint) throw new Error('retail-print-kit: USB printer has no OUT endpoint');
     this.inEndpoint = (iface.endpoints.find((e) => e.direction === 'in') as import('usb').InEndpoint | undefined) ?? null;
     this.device = device;
     this.iface = iface;
@@ -76,7 +76,7 @@ export class UsbTransport implements Transport {
 
   write(bytes: Buffer): Promise<void> {
     const endpoint = this.endpoint;
-    if (!endpoint) return Promise.reject(new Error('thermal-print: USB transport is not open'));
+    if (!endpoint) return Promise.reject(new Error('retail-print-kit: USB transport is not open'));
     endpoint.timeout = this.options.timeout ?? 5000;
     return new Promise((resolve, reject) => {
       endpoint.transfer(bytes, (err) => (err ? reject(err) : resolve()));
@@ -85,7 +85,7 @@ export class UsbTransport implements Transport {
 
   read(timeoutMs: number): Promise<Buffer> {
     const ep = this.inEndpoint;
-    if (!ep) return Promise.reject(new Error('thermal-print: USB printer has no IN endpoint'));
+    if (!ep) return Promise.reject(new Error('retail-print-kit: USB printer has no IN endpoint'));
     ep.timeout = timeoutMs;
     return new Promise((resolve, reject) => {
       ep.transfer(64, (err, data) => (err ? reject(err) : resolve(Buffer.from(data ?? []))));

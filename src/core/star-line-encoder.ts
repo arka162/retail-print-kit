@@ -81,16 +81,16 @@ export function encodeStarLine(ops: Op[], profile: Profile): Buffer {
         const pos = o.position ?? 'below';
         const hri = pos === 'none' || pos === 'above' ? 3 : 4;
         const code = BARCODE_CODE[op.type];
-        if (code === undefined) throw new Error(`thermal-print: Star Line has no barcode type ${op.type}`);
+        if (code === undefined) throw new Error(`retail-print-kit: Star Line has no barcode type ${op.type}`);
         push([ESC, 0x62, code, hri, clamp(o.width ?? 2, 1, 9), clamp(o.height ?? 80, 1, 255)], Buffer.from(op.data, 'ascii'), RS);
         break;
       }
       case 'qr':
-        if (!profile.features.nativeQr) throw new Error(`thermal-print: profile ${profile.id} has no native QR`);
+        if (!profile.features.nativeQr) throw new Error(`retail-print-kit: profile ${profile.id} has no native QR`);
         pushQr(push, op.data, op.options);
         break;
       case 'raster': {
-        if (!profile.features.raster) throw new Error(`thermal-print: profile ${profile.id} cannot print raster images`);
+        if (!profile.features.raster) throw new Error(`retail-print-kit: profile ${profile.id} cannot print raster images`);
         const xBytes = Math.ceil(op.width / 8);
         push([ESC, GS, 0x53, 1, xBytes & 0xff, xBytes >> 8, op.height & 0xff, op.height >> 8, 0], op.bits);
         break;

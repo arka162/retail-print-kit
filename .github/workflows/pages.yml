@@ -30,7 +30,7 @@ jobs:
           cp apps/designer/* site/apps/designer/
           cp dist/browser/* site/dist/browser/
           cp site/apps/designer/index.html site/index.html
-          sed -i 's#"designer.css"#"apps/designer/designer.css"#; s#"../../dist/browser/thermal-print.js"#"dist/browser/thermal-print.js"#; s#"designer.js"#"apps/designer/designer.js"#' site/index.html
+          sed -i 's#"designer.css"#"apps/designer/designer.css"#; s#"../../dist/browser/retail-print-kit.js"#"dist/browser/retail-print-kit.js"#; s#"designer.js"#"apps/designer/designer.js"#' site/index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

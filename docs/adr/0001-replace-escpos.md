@@ -1,4 +1,4 @@
-# ADR 0001: Build `thermal-print` to replace the `escpos` package
+# ADR 0001: Build `retail-print-kit` to replace the `escpos` package
 
 Status: accepted. Date: 2026-10-02. Owner: Arkaprova Majumder.
 
@@ -16,7 +16,7 @@ printers that need different cut, pulse and code page settings.
 
 ## Decision
 
-Write a new package, `thermal-print`, owned and published by Arkaprova Majumder (MIT), with:
+Write a new package, `retail-print-kit`, owned and published by Arkaprova Majumder (MIT), with:
 
 1. **A pure-JavaScript core.** A receipt is a list of operations (`Op`). An `Encoder` turns ops into
    bytes using a `Profile`. No native dependency in the core, so it runs in Node, Electron main and
@@ -48,7 +48,7 @@ Write a new package, `thermal-print`, owned and published by Arkaprova Majumder 
 ## Alternatives rejected
 
 * **Fork `escpos`.** Its design mixes transport and commands and has no printer model concept.
-* **`node-thermal-printer`.** Closer to what we need, but still a single builder with model `if`s,
+* **`node-retail-print-kiter`.** Closer to what we need, but still a single builder with model `if`s,
   no status, and drags its own transport choices along.
 * **Print everything as PDF over IPP.** Works for office printers, not for drawer kick, partial cut
   or the speed a till needs.
