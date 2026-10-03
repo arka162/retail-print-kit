@@ -1,5 +1,6 @@
 import QRCode from 'qrcode';
 import { QrOptions } from './ops';
+import { toBase64, fromBase64 } from '../util/base64';
 
 /** 1-bit image, rows packed MSB first, 1 = black. `bits.length === ceil(width/8) * height`. */
 export interface Bitmap {
@@ -70,4 +71,51 @@ export function qrBitmap(data: string, options: QrOptions = {}): Bitmap {
     }
   }
   return b;
+}
+
+/**
+ * RGBA pixels to 1-bit with Floyd-Steinberg error diffusion. Use for photos and logos with
+ * gradients; `fromRgba` (plain threshold) is sharper for line art and text.
+ */
+export function ditherRgba(data: Uint8ClampedArray | Uint8Array, width: number, height: number): Bitmap {
+  const lum = new Float32Array(width * height);
+  for (let i = 0; i < width * height; i++) {
+    const a = data[i * 4 + 3] / 255;
+    lum[i] = (0.299 * data[i * 4] + 0.587 * data[i * 4 + 1] + 0.114 * data[i * 4 + 2]) * a + 255 * (1 - a);
+  }
+  const b = emptyBitmap(width, height);
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const i = y * width + x;
+      const old = lum[i];
+      const black = old < 128;
+      if (black) setPixel(b, x, y, true);
+      const err = old - (black ? 0 : 255);
+      if (x + 1 < width) lum[i + 1] += (err * 7) / 16;
+      if (y + 1 < height) {
+        if (x > 0) lum[i + width - 1] += (err * 3) / 16;
+        lum[i + width] += (err * 5) / 16;
+        if (x + 1 < width) lum[i + width + 1] += err / 16;
+      }
+    }
+  }
+  return b;
+}
+
+/** A bitmap as plain JSON (`{ width, height, data }`, bits in base64), for templates and storage. */
+export interface SerializedBitmap {
+  width: number;
+  height: number;
+  data: string;
+}
+
+export function serializeBitmap(b: Bitmap): SerializedBitmap {
+  return { width: b.width, height: b.height, data: toBase64(b.bits) };
+}
+
+export function deserializeBitmap(s: SerializedBitmap): Bitmap {
+  const bits = fromBase64(s.data);
+  const expected = Math.ceil(s.width / 8) * s.height;
+  if (bits.length !== expected) throw new Error(`retail-print-kit: bitmap data is ${bits.length} bytes, expected ${expected}`);
+  return { width: s.width, height: s.height, bits };
 }

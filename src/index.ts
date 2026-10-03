@@ -19,3 +19,8 @@ export * from './preview';
 export * from './core/identify';
 export * from './label';
 export { toBase64 } from './util/base64';
+export { loadImage } from './core/image';
+export type { LoadImageOptions } from './core/image';
+export { discoverNetworkPrinters, localSubnets } from './transports/discover';
+export type { DiscoverOptions, DiscoveredPrinter } from './transports/discover';
+export { fromBase64 } from './util/base64';

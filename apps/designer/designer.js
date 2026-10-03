@@ -56,6 +56,7 @@
       cut: { partial: 'bool', feed: num(0, 20) }, drawer: { pin: { kind: 'select', options: [2, 5] } },
       qr: { value: 'text', size: num(1, 16), align: { kind: 'select', options: ALIGN } },
       barcode: { value: 'text', format: { kind: 'select', options: FORMATS }, height: num(1, 255), width: num(2, 6), align: { kind: 'select', options: ALIGN }, text: 'bool' },
+      image: { file: 'image', align: { kind: 'select', options: ALIGN } },
       each: { items: 'text' }, if: { when: 'text' },
     },
     label: {
@@ -71,10 +72,34 @@
       table: { type: 'table', rows: 'items', columns: [{ value: '{{name}}', header: 'Item', width: 0.7 }, { value: '{{total | money:$}}', header: 'Amount', width: 0.3, align: 'RIGHT' }] },
       feed: { type: 'feed', lines: 1 }, newline: { type: 'newline', count: 1 }, cut: { type: 'cut' }, drawer: { type: 'drawer' },
       qr: { type: 'qr', value: 'https://example.com', align: 'center', size: 4 }, barcode: { type: 'barcode', value: '12345678', format: 'CODE128', height: 60, align: 'center' },
+      image: placeholderImage(),
       each: { type: 'each', items: 'items', blocks: [{ type: 'text', value: '{{name}}' }] }, if: { type: 'if', when: 'customer', blocks: [{ type: 'text', value: 'yes' }], else: [] } },
     label: { text: { type: 'text', x: 10, y: 10, value: 'Text', height: 24 }, barcode: { type: 'barcode', x: 10, y: 60, value: '{{upc}}', format: 'CODE128', height: 40 },
       qr: { type: 'qr', x: 10, y: 10, value: 'https://example.com', module: 3 }, box: { type: 'box', x: 2, y: 2, width: 100, height: 60, thickness: 2 }, rect: { type: 'rect', x: 10, y: 10, width: 50, height: 4 } },
   };
+
+  function placeholderImage() {
+    const b = T.emptyBitmap(96, 48);
+    for (let x = 0; x < 96; x++) { T.setPixel(b, x, 0, true); T.setPixel(b, x, 47, true); T.setPixel(b, x, Math.round(x / 2), true); T.setPixel(b, x, 47 - Math.round(x / 2), true); }
+    for (let y = 0; y < 48; y++) { T.setPixel(b, 0, y, true); T.setPixel(b, 95, y, true); }
+    return Object.assign({ type: 'image', align: 'center' }, T.serializeBitmap(b));
+  }
+  function loadImageFile(file, block, width, dither) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const w = Math.max(8, Math.min(width, 832));
+        const h = Math.max(1, Math.round(img.height * w / img.width));
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h);
+        const px = ctx.getImageData(0, 0, w, h).data;
+        Object.assign(block, T.serializeBitmap(dither ? T.ditherRgba(px, w, h) : T.fromRgba(px, w, h)));
+        resolve();
+      };
+      img.onerror = () => reject(new Error('could not read that image'));
+      img.src = URL.createObjectURL(file);
+    });
+  }
 
   let tpl = DEFAULT_RECEIPT;
   let data = SAMPLE_RECEIPT;
@@ -140,6 +165,7 @@
     if (b.items) return 'each ' + b.items;
     if (b.when) return 'if ' + b.when;
     if (b.char) return b.char;
+    if (b.type === 'image') return b.width + ' x ' + b.height + ' dots';
     return Object.keys(b).filter((k) => k !== 'type').map((k) => k + '=' + b[k]).join(' ');
   }
 
@@ -185,7 +211,13 @@
       const row = document.createElement('div'); row.className = 'field';
       const lab = document.createElement('label'); lab.textContent = key; row.appendChild(lab);
       let input;
-      if (def === 'text') { input = document.createElement('input'); input.value = b[key] == null ? '' : b[key]; input.oninput = () => { b[key] = input.value; renderPreview(); renderTreeSoft(); }; }
+      if (def === 'image') {
+        input = document.createElement('div');
+        input.innerHTML = '<input type="file" accept="image/*"><div style="margin-top:4px">width <input type="number" min="8" max="832" value="' + b.width + '" style="width:70px"> <label><input type="checkbox"> dither</label></div>';
+        const [file, w] = input.querySelectorAll('input'); const dither = input.querySelector('input[type=checkbox]');
+        file.onchange = () => { if (!file.files[0]) return; loadImageFile(file.files[0], b, Number(w.value) || 384, dither.checked).then(() => { render(); }).catch((e) => { $('error').hidden = false; $('error').textContent = e.message; }); };
+      }
+      else if (def === 'text') { input = document.createElement('input'); input.value = b[key] == null ? '' : b[key]; input.oninput = () => { b[key] = input.value; renderPreview(); renderTreeSoft(); }; }
       else if (def === 'bool') { input = document.createElement('input'); input.type = 'checkbox'; input.checked = b[key] !== false && b[key] !== undefined ? !!b[key] : false; input.onchange = () => { b[key] = input.checked; renderPreview(); }; }
       else if (def === 'size') { input = document.createElement('div'); input.innerHTML = 'w <input type="number" min="1" max="8" style="width:50px"> h <input type="number" min="1" max="8" style="width:50px">'; const [w, h] = input.querySelectorAll('input'); w.value = (b.size || [1, 1])[0]; h.value = (b.size || [1, 1])[1]; w.oninput = h.oninput = () => { b.size = [Number(w.value) || 1, Number(h.value) || 1]; renderPreview(); }; }
       else if (def.kind === 'number') { input = document.createElement('input'); input.type = 'number'; input.min = def.min; input.max = def.max; input.step = def.step; input.value = b[key] == null ? '' : b[key]; input.oninput = () => { b[key] = input.value === '' ? undefined : Number(input.value); renderPreview(); }; }
@@ -297,6 +329,7 @@
           step('edit value', () => { const inp = $('props').querySelector('input'); inp.value = '{{store.name}} SELFTEST'; inp.dispatchEvent(new Event('input')); });
           step('preview updated', () => { if (!$('preview').querySelector('iframe').srcdoc.includes('My Store SELFTEST')) throw new Error('srcdoc lacks the edit'); });
           step('add qr', () => { selected = null; Array.from($('palette').children).find((b) => b.textContent === 'qr').click(); if (items()[items().length - 1].type !== 'qr') throw new Error('qr not appended'); });
+          step('add image', () => { selected = null; Array.from($('palette').children).find((b) => b.textContent === 'image').click(); const last = items()[items().length - 1]; if (last.type !== 'image' || !last.data) throw new Error('image not appended'); if (($('preview').querySelector('iframe').srcdoc.match(/<img /g) || []).length < 2) throw new Error('image missing from preview'); $('tree').querySelector('.node:last-child .tools button:last-child').click(); });
           step('delete it', () => { $('tree').querySelector('.node:last-child .tools button:last-child').click(); if (items()[items().length - 1].type === 'qr') throw new Error('qr still there'); });
         } else {
           step('select price', () => { $('tree').querySelectorAll('.node')[2].click(); if (byPath(selected).value !== '{{price | money:$}}') throw new Error('wrong block'); });

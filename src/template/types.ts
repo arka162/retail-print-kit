@@ -23,6 +23,7 @@ export type Block =
   | { type: 'drawer'; pin?: 2 | 5 }
   | { type: 'qr'; value: string; size?: number; align?: TAlign }
   | { type: 'barcode'; value: string; format?: BarcodeType; height?: number; width?: number; align?: TAlign; text?: boolean }
+  | { type: 'image'; width: number; height: number; data: string; align?: TAlign }
   | { type: 'each'; items: string; blocks: Block[] }
   | { type: 'if'; when: string; blocks: Block[]; else?: Block[] };
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 const fs = require('fs');
-const { Printer, profiles, profileById, NetTransport, identify, opsToHtml, opsToPng, OpBuilder, render, renderLabel, encodeLabel, labelToSvg } = require('../dist');
+const { Printer, profiles, profileById, NetTransport, identify, opsToHtml, opsToPng, OpBuilder, render, renderLabel, encodeLabel, labelToSvg, discoverNetworkPrinters, emptyBitmap, setPixel, qrBitmap, LabelBuilder, loadImage } = require('../dist');
 
 process.stdout.on('error', (err) => {
   if (err.code === 'EPIPE') process.exit(0);
@@ -14,6 +14,11 @@ Commands
   test       print a test page (text styles, table, barcode, QR) and show status
   drawer     kick the cash drawer
   status     print the printer status as JSON
+  verify     print the numbered hardware verification page (see docs/hardware-checklist.md)
+             add --drawer to kick pin 2 then pin 5
+  verify-label  print a verification label: --language zpl|tspl|ezpl [--width-mm 50.8 --height-mm 25.4]
+  discover   find printers on the local network (port 9100); --identify asks each one its model
+  image      print an image file: --file logo.png [--width 384] [--dither]
   identify   ask the printer its maker, model and firmware; suggest a profile
   preview    write the test page as HTML (--out page.html) or PNG (--out page.png)
   print      print a template: --template t.json --data d.json (receipt or label)
@@ -124,6 +129,72 @@ async function testPage(printer, profile) {
   await showStatus(printer);
 }
 
+function section(p, id, title) {
+  p.align('lt').style('b').text(`[${id}] ${title}`).style('normal');
+}
+
+async function verifyPage(printer, profile, args) {
+  const cols = profile.columns.a;
+  const ruler = (n) => '1234567890'.repeat(Math.ceil(n / 10)).slice(0, n);
+  printer.align('ct').style('b').size(2, 2).text('VERIFY').size(1, 1).style('normal')
+    .text(`${profile.id} / ${profile.set}`).text(new Date().toLocaleString()).align('lt').drawLine();
+  section(printer, 'V1', `Font A ruler: last digit must be ${ruler(cols).slice(-1)} at the right edge (${cols} cols)`);
+  printer.text(ruler(cols));
+  section(printer, 'V2', `Font B ruler (${profile.columns.b} cols)`);
+  printer.setFont('b').text(ruler(profile.columns.b)).setFont('a');
+  section(printer, 'V3', 'Styles: bold, underline, double width, double height, inverse');
+  printer.style('b').text('bold').style('u').text('underline').style('normal').size(2, 1).text('wide').size(1, 2).text('tall').size(1, 1)
+    .style({ invert: true }).text(' inverse ').style('normal');
+  section(printer, 'V4', 'Alignment: left, centre, right');
+  printer.align('lt').text('left').align('ct').text('centre').align('rt').text('right').align('lt');
+  section(printer, 'V5', 'Code page: bytes 80..FF (expect CP437 box drawing in B0..DF)');
+  for (let row = 0x80; row < 0x100; row += 16) {
+    printer.print(row.toString(16).toUpperCase() + ' ').raw(Array.from({ length: 16 }, (_, i) => row + i)).newLine();
+  }
+  section(printer, 'V6', 'Barcodes: UPC-A, EAN-13, CODE128, CODE39');
+  printer.align('ct')
+    .barcode('036000291452', 'UPC_A', { height: 50 }).newLine()
+    .barcode('5901234123457', 'EAN13', { height: 50 }).newLine()
+    .barcode('RPK-12345', 'CODE128', { height: 50 }).newLine()
+    .barcode('RPK 123', 'CODE39', { height: 50 }).newLine().align('lt');
+  section(printer, 'V7', 'QR A = printer native, QR B = bitmap; both must scan to the same URL');
+  printer.align('ct').text('A');
+  if (profile.features.nativeQr || profile.set === 'star-graphic') printer.qr('https://github.com/arka162/thermal-print', { size: 5 });
+  else printer.text('(no native QR on this profile)');
+  printer.newLine().text('B').image(qrBitmap('https://github.com/arka162/thermal-print', { size: 5 })).newLine().align('lt');
+  section(printer, 'V8', 'Raster: checkerboard, then a diagonal line, edges sharp');
+  const bm = emptyBitmap(256, 64);
+  for (let y = 0; y < 64; y++) for (let x = 0; x < 256; x++) if (x < 128 ? ((x >> 3) + (y >> 3)) % 2 === 0 : Math.abs(x - 128 - y * 2) < 2) setPixel(bm, x, y, true);
+  printer.align('ct').image(bm).newLine().align('lt');
+  section(printer, 'V9', 'Partial cut follows this line');
+  printer.cut(true);
+  section(printer, 'V10', 'Full cut follows this line');
+  printer.text('End of verification page. Fill in docs/hardware-checklist.md.').cut(false);
+  await printer.flush();
+  if (args.drawer) {
+    printer.cashdraw(2);
+    await printer.flush();
+    await new Promise((r) => setTimeout(r, 1500));
+    printer.cashdraw(5);
+    await printer.flush();
+    console.log('V11 drawer: kicked pin 2, then pin 5 after 1.5 s');
+  }
+  await showStatus(printer);
+}
+
+function verifyLabel(args) {
+  const b = new LabelBuilder({ widthMm: Number(args['width-mm'] || 50.8), heightMm: Number(args['height-mm'] || 25.4), dpi: Number(args.dpi || 203) });
+  const w = b.label.width;
+  const h = b.label.height;
+  b.box(2, 2, w - 4, h - 4, 2)
+    .text(10, 8, 'L1 text 20', 20).text(10, 32, 'L2 text 32', 32)
+    .barcode(10, 72, '036000291452', 'UPC_A', 40)
+    .qr(w - 110, 8, 'https://github.com/arka162/thermal-print', { module: 3 })
+    .rect(10, h - 14, w - 20, 4)
+    .text(w - 150, h - 60, String(args.language || 'zpl').toUpperCase(), 40, { bold: true });
+  return b.label;
+}
+
 async function showStatus(printer) {
   if (!printer.transport.read) return;
   try {
@@ -144,6 +215,35 @@ async function main() {
       return withPrinter(args, async (p) => { p.cashdraw(args.pin === '5' ? 5 : 2); });
     case 'status':
       return withPrinter(args, showStatus);
+    case 'verify':
+      return withPrinter(args, (p, profile) => verifyPage(p, profile, args));
+    case 'verify-label': {
+      const label = verifyLabel(args);
+      const language = String(args.language || 'zpl');
+      if (args.out) {
+        const out = String(args.out);
+        fs.writeFileSync(out, out.endsWith('.svg') ? labelToSvg(label) : Buffer.from(encodeLabel(label, language)));
+        console.log(`wrote ${out}`);
+        return;
+      }
+      const t = transportFor(args);
+      await t.open();
+      try { await t.write(Buffer.from(encodeLabel(label, language))); } finally { await t.close(); }
+      return;
+    }
+    case 'discover': {
+      const found = await discoverNetworkPrinters({ port: args.port ? Number(args.port) : undefined, identify: !!args.identify });
+      if (!found.length) console.log('no hosts answered on the printing port');
+      for (const p of found) {
+        const id = p.identity;
+        console.log(`${p.host}:${p.port}` + (id ? `  ${id.maker || '?'} ${id.model || ''}  -> ${id.profile ? id.profile.id : 'unknown'}` : ''));
+      }
+      return;
+    }
+    case 'image': {
+      const bm = await loadImage(String(args.file), { width: args.width ? Number(args.width) : undefined, dither: !!args.dither });
+      return withPrinter(args, async (p) => { p.align('ct').image(bm).newLine().cut(); });
+    }
     case 'identify': {
       const t = transportFor(args);
       await t.open();

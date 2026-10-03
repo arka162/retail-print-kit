@@ -12,4 +12,4 @@ export { opsToHtml } from './preview/html';
 export type { HtmlPreviewOptions } from './preview/html';
 export { bitmapToPng } from './preview/png';
 export * from './label';
-export { toBase64 } from './util/base64';
+export { toBase64, fromBase64 } from './util/base64';

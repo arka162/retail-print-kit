@@ -3,6 +3,7 @@ import { OpBuilder, TableCell } from '../core/builder';
 import { Profile } from '../profiles/types';
 import { Block, Template } from './types';
 import { Scope, evaluate, interpolate, truthy } from './expr';
+import { deserializeBitmap } from '../core/bitmap';
 
 const ALIGN = { left: 'lt', center: 'ct', right: 'rt' } as const;
 
@@ -76,6 +77,12 @@ function renderBlock(block: Block, scope: Scope, b: OpBuilder): void {
         width: block.width,
         position: block.text === false ? 'none' : 'below',
       });
+      if (block.align && block.align !== 'left') b.align('lt');
+      break;
+    }
+    case 'image': {
+      if (block.align) b.align(ALIGN[block.align]);
+      b.image(deserializeBitmap(block));
       if (block.align && block.align !== 'left') b.align('lt');
       break;
     }
