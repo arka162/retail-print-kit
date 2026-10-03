@@ -122,7 +122,7 @@ async function testPage(printer, profile) {
     .tableCustom([{ text: 'TOTAL', width: 0.7, style: 'b' }, { text: '$12.50', width: 0.3, align: 'RIGHT' }])
     .newLine()
     .align('ct').barcode('036000291452', 'UPC_A', { height: 60, width: 2 }).newLine()
-    .qr('https://github.com/arka162/thermal-print', { size: 5 }).newLine()
+    .qr('https://github.com/arka162/retail-print-kit', { size: 5 }).newLine()
     .align('lt').text(`${'='.repeat(10)} end of test ${'='.repeat(10)}`)
     .cut();
   await printer.flush();
@@ -159,9 +159,9 @@ async function verifyPage(printer, profile, args) {
     .barcode('RPK 123', 'CODE39', { height: 50 }).newLine().align('lt');
   section(printer, 'V7', 'QR A = printer native, QR B = bitmap; both must scan to the same URL');
   printer.align('ct').text('A');
-  if (profile.features.nativeQr || profile.set === 'star-graphic') printer.qr('https://github.com/arka162/thermal-print', { size: 5 });
+  if (profile.features.nativeQr || profile.set === 'star-graphic') printer.qr('https://github.com/arka162/retail-print-kit', { size: 5 });
   else printer.text('(no native QR on this profile)');
-  printer.newLine().text('B').image(qrBitmap('https://github.com/arka162/thermal-print', { size: 5 })).newLine().align('lt');
+  printer.newLine().text('B').image(qrBitmap('https://github.com/arka162/retail-print-kit', { size: 5 })).newLine().align('lt');
   section(printer, 'V8', 'Raster: checkerboard, then a diagonal line, edges sharp');
   const bm = emptyBitmap(256, 64);
   for (let y = 0; y < 64; y++) for (let x = 0; x < 256; x++) if (x < 128 ? ((x >> 3) + (y >> 3)) % 2 === 0 : Math.abs(x - 128 - y * 2) < 2) setPixel(bm, x, y, true);
@@ -189,7 +189,7 @@ function verifyLabel(args) {
   b.box(2, 2, w - 4, h - 4, 2)
     .text(10, 8, 'L1 text 20', 20).text(10, 32, 'L2 text 32', 32)
     .barcode(10, 72, '036000291452', 'UPC_A', 40)
-    .qr(w - 110, 8, 'https://github.com/arka162/thermal-print', { module: 3 })
+    .qr(w - 110, 8, 'https://github.com/arka162/retail-print-kit', { module: 3 })
     .rect(10, h - 14, w - 20, 4)
     .text(w - 150, h - 60, String(args.language || 'zpl').toUpperCase(), 40, { bold: true });
   return b.label;

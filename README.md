@@ -1,7 +1,7 @@
 # retail-print-kit
 
 [![npm](https://img.shields.io/npm/v/retail-print-kit.svg)](https://www.npmjs.com/package/retail-print-kit)
-[![ci](https://github.com/arka162/thermal-print/actions/workflows/ci.yml/badge.svg)](https://github.com/arka162/thermal-print/actions/workflows/ci.yml)
+[![ci](https://github.com/arka162/retail-print-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/arka162/retail-print-kit/actions/workflows/ci.yml)
 [![license](https://img.shields.io/npm/l/retail-print-kit.svg)](LICENSE)
 
 **Receipt printers, cash drawers and label printers for Node.js and Electron, in one package.**
@@ -10,9 +10,9 @@ A modern replacement for `escpos` / `node-thermal-printer`: ESC/POS **and** Star
 network / serial, printer profiles instead of model `if`s, receipt and label **templates**, live
 **previews**, a visual **designer**, and a CLI for testing hardware in the field.
 
-**[Open the designer](https://arka162.github.io/thermal-print/)** · [Printer matrix](docs/printer-matrix.md) · [Hardware checklist](docs/hardware-checklist.md)
+**[Open the designer](https://arka162.github.io/retail-print-kit/)** · [Printer matrix](docs/printer-matrix.md) · [Hardware checklist](docs/hardware-checklist.md)
 
-![Receipt designer](https://raw.githubusercontent.com/arka162/thermal-print/main/docs/images/designer-receipt.png)
+![Receipt designer](https://raw.githubusercontent.com/arka162/retail-print-kit/main/docs/images/designer-receipt.png)
 
 ## Why
 
@@ -153,11 +153,11 @@ const svg = labelToSvg(b.label);                // preview
 const label = renderLabel(labelTemplate, data); // from a designer JSON
 ```
 
-![Label designer](https://raw.githubusercontent.com/arka162/thermal-print/main/docs/images/designer-label.png)
+![Label designer](https://raw.githubusercontent.com/arka162/retail-print-kit/main/docs/images/designer-label.png)
 
 ## Designer
 
-**https://arka162.github.io/thermal-print/** edits receipt and label templates in the browser:
+**https://arka162.github.io/retail-print-kit/** edits receipt and label templates in the browser:
 block palette, nested `each` / `if`, property editor, sample data, live preview, drag-to-position
 on labels, logo upload with dithering, JSON import and export. It runs entirely in the page from
 the browser bundle (`retail-print-kit/browser`); nothing is uploaded.
@@ -169,7 +169,7 @@ printer.toHtml();                                 // paper-like HTML of the reco
 opsToHtml(ops, profile); opsToPng(ops, profile);  // same without a Printer
 ```
 
-<img src="https://raw.githubusercontent.com/arka162/thermal-print/main/docs/images/test-page.png" width="300" alt="PNG preview of the test page">
+<img src="https://raw.githubusercontent.com/arka162/retail-print-kit/main/docs/images/test-page.png" width="300" alt="PNG preview of the test page">
 
 ## Find and identify printers
 

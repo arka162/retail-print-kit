@@ -1,12 +1,12 @@
 {
   "name": "retail-print-kit",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Receipt printers, cash drawers and label printers for Node.js and Electron: ESC/POS (Epson and compatibles), Star, ZPL, TSPL, EZPL; USB, network and serial; templates, previews, a visual designer and a CLI.",
   "author": "Arkaprova Majumder <arka162@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/arka162/thermal-print.git"
+    "url": "https://github.com/arka162/retail-print-kit.git"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -78,9 +78,9 @@
   "bin": {
     "retail-print-kit": "./bin/retail-print-kit.js"
   },
-  "homepage": "https://arka162.github.io/thermal-print/",
+  "homepage": "https://arka162.github.io/retail-print-kit/",
   "bugs": {
-    "url": "https://github.com/arka162/thermal-print/issues"
+    "url": "https://github.com/arka162/retail-print-kit/issues"
   },
   "keywords": [
     "escpos",
