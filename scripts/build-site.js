@@ -173,7 +173,8 @@ write('index.html', page({
   jsonLd: { '@context': 'https://schema.org', '@type': 'SoftwareApplication', name: 'retail-print-kit', applicationCategory: 'DeveloperApplication', operatingSystem: 'Windows, macOS, Linux', softwareVersion: pkg.version, description: pkg.description, url: BASE + '/', downloadUrl: 'https://www.npmjs.com/package/retail-print-kit', codeRepository: REPO, license: 'https://opensource.org/licenses/MIT', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, author: { '@type': 'Person', name: 'Arkaprova Majumder' } },
 }));
 
-for (const f of ['site.css', 'robots.txt', 'og.png']) {
+const verification = fs.readdirSync(path.join(ROOT, 'site')).filter((f) => /^google[0-9a-f]+\.html$/.test(f));
+for (const f of ['site.css', 'robots.txt', 'og.png', ...verification]) {
   const src = path.join(ROOT, 'site', f);
   if (fs.existsSync(src)) fs.copyFileSync(src, path.join(OUT, f));
 }
