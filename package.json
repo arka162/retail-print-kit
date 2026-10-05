@@ -1,6 +1,6 @@
 {
   "name": "retail-print-kit",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Receipt printers, cash drawers and label printers for Node.js and Electron: ESC/POS (Epson and compatibles), Star, ZPL, TSPL, EZPL; USB, network and serial; templates, previews, a visual designer and a CLI.",
   "author": "Arkaprova Majumder <arka162@gmail.com>",
   "license": "MIT",
@@ -51,7 +51,7 @@
   },
   "dependencies": {
     "iconv-lite": "^0.6.3",
-    "qrcode": "^1.5.4"
+    "qrcode-generator": "^2.0.4"
   },
   "peerDependencies": {
     "@napi-rs/canvas": ">=0.1",
@@ -59,6 +59,9 @@
     "usb": ">=2"
   },
   "peerDependenciesMeta": {
+    "@napi-rs/canvas": {
+      "optional": true
+    },
     "serialport": {
       "optional": true
     },
@@ -69,7 +72,6 @@
   "devDependencies": {
     "@napi-rs/canvas": "^0.1.100",
     "@types/node": "^18.19.0",
-    "@types/qrcode": "^1.5.6",
     "esbuild": "^0.23.1",
     "serialport": "^12.0.0",
     "typescript": "^5.4.0",

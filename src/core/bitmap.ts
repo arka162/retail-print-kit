@@ -1,4 +1,4 @@
-import QRCode from 'qrcode';
+import qrcode from 'qrcode-generator';
 import { QrOptions } from './ops';
 import { toBase64, fromBase64 } from '../util/base64';
 
@@ -60,13 +60,18 @@ export function fitWidth(src: Bitmap, width: number, align: 'left' | 'center' | 
 
 /** QR code as a bitmap, each module `options.size` dots square (default 6, like Epson cell size). */
 export function qrBitmap(data: string, options: QrOptions = {}): Bitmap {
-  const qr = QRCode.create(data, { errorCorrectionLevel: options.correction ?? 'M' });
-  const n = qr.modules.size;
+  const utf8 = new TextEncoder().encode(data);
+  let bytes = '';
+  for (let i = 0; i < utf8.length; i++) bytes += String.fromCharCode(utf8[i]);
+  const qr = qrcode(0, options.correction ?? 'M');
+  qr.addData(bytes, 'Byte');
+  qr.make();
+  const n = qr.getModuleCount();
   const scale = Math.max(1, Math.min(16, Math.floor(options.size ?? 6)));
   const b = emptyBitmap(n * scale, n * scale);
   for (let y = 0; y < n; y++) {
     for (let x = 0; x < n; x++) {
-      if (!qr.modules.get(y, x)) continue;
+      if (!qr.isDark(y, x)) continue;
       for (let dy = 0; dy < scale; dy++) for (let dx = 0; dx < scale; dx++) setPixel(b, x * scale + dx, y * scale + dy, true);
     }
   }
