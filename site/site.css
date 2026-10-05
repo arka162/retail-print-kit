@@ -1,0 +1,34 @@
+:root { --text: #111827; --muted: #4b5563; --line: #e5e7eb; --accent: #b91c1c; --bg: #ffffff; --code: #f3f4f6; }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--text); background: var(--bg); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+header.site { border-bottom: 1px solid var(--line); }
+header.site .in, main, footer.site .in { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+header.site .in { display: flex; gap: 18px; align-items: center; height: 56px; flex-wrap: wrap; }
+header.site .brand { font-weight: 700; color: var(--text); }
+header.site nav { display: flex; gap: 16px; margin-left: auto; font-size: 15px; }
+main { padding-top: 28px; padding-bottom: 56px; }
+h1 { font-size: 34px; line-height: 1.2; margin: 0 0 14px; }
+h2 { font-size: 23px; margin: 38px 0 10px; padding-top: 6px; border-top: 1px solid var(--line); }
+h3 { font-size: 18px; margin: 24px 0 6px; }
+p { margin: 10px 0; }
+.lead { font-size: 20px; color: var(--muted); }
+pre { background: #111827; color: #e5e7eb; padding: 14px 16px; border-radius: 8px; overflow-x: auto; font: 14px/1.5 ui-monospace, Menlo, Consolas, monospace; }
+code { font: 0.9em ui-monospace, Menlo, Consolas, monospace; background: var(--code); padding: 1px 5px; border-radius: 4px; }
+pre code { background: none; padding: 0; font-size: inherit; }
+table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 15px; display: block; overflow-x: auto; }
+th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; vertical-align: top; }
+th { background: #f9fafb; }
+ul, ol { padding-left: 22px; }
+img { max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 8px; }
+.cta { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0 8px; }
+.btn { display: inline-block; padding: 9px 16px; border-radius: 8px; border: 1px solid var(--accent); font-weight: 600; }
+.btn.primary { background: var(--accent); color: #fff; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; padding: 0; list-style: none; }
+.cards li { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+.cards li a { font-weight: 600; }
+.cards li span { display: block; color: var(--muted); font-size: 14px; margin-top: 4px; }
+footer.site { border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+footer.site .in { padding-top: 18px; padding-bottom: 28px; }

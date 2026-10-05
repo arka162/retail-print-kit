@@ -1,0 +1,85 @@
+<h1>Receipt, cash drawer and label printing for Node.js and Electron</h1>
+<p class="lead"><strong>retail-print-kit</strong> is an open source npm package that prints to ESC/POS thermal receipt printers (Epson and compatibles), Star printers including the TSP100, and ZPL, TSPL and EZPL label printers, over USB, network or serial.</p>
+<div class="cta">
+  <a class="btn primary" href="designer/">Open the designer</a>
+  <a class="btn" href="guides/">Read the guides</a>
+  <a class="btn" href="https://www.npmjs.com/package/retail-print-kit">npm</a>
+  <a class="btn" href="https://github.com/arka162/retail-print-kit">GitHub</a>
+</div>
+<pre><code>npm install retail-print-kit</code></pre>
+<p>A plain install is 4 packages and under 2 MB with no native modules. MIT licensed, TypeScript types included, Node 18 or newer.</p>
+
+<h2>Print a receipt in ten lines</h2>
+<pre><code>const { Printer, profiles } = require('retail-print-kit');
+const { NetTransport } = require('retail-print-kit/net');
+
+const printer = new Printer(new NetTransport('192.168.1.50'), profiles['epson-tm-t88']);
+await printer.open();
+printer
+  .align('ct').style('b').size(2, 2).text('MY STORE')
+  .size(1, 1).style('normal').align('lt')
+  .tableCustom([{ text: 'Coffee', width: 0.7 }, { text: '$2.50', align: 'RIGHT', width: 0.3 }])
+  .qr('https://example.com/receipt/1042')
+  .cut().cashdraw();
+await printer.close();</code></pre>
+
+<h2>What it does</h2>
+<ul>
+  <li><strong>Receipt printers:</strong> Epson TM-T88, TM-T20, TM-m30 and ESC/POS compatibles (Bixolon, Citizen, SNBC, Xprinter, Rongta, HPRT); Star TSP650II and mC-Print3 in Star Line Mode; Star TSP100 and TSP143 in raster mode.</li>
+  <li><strong>Cash drawers:</strong> kick pin 2 or pin 5 with the right pulse for the printer.</li>
+  <li><strong>Label printers:</strong> one label definition encoded as ZPL (Zebra), TSPL (TSC, Xprinter, Rongta) or EZPL (Godex).</li>
+  <li><strong>Connections:</strong> raw TCP on port 9100, USB and serial.</li>
+  <li><strong>Templates:</strong> receipts and labels as JSON with data placeholders, loops and conditions.</li>
+  <li><strong>Previews:</strong> HTML, PNG and SVG of exactly what will print, with no printer attached.</li>
+  <li><strong>Printer status and discovery:</strong> paper out, cover open, cutter error, drawer state; find printers on the network and identify the model.</li>
+  <li><strong>A visual designer</strong> in the browser and a <strong>CLI</strong> for testing hardware.</li>
+</ul>
+
+<h2>The designer</h2>
+<p>Build a receipt or a label visually and export the JSON template your app prints. It runs entirely in your browser; nothing is uploaded.</p>
+<p><a href="designer/"><img src="https://raw.githubusercontent.com/arka162/retail-print-kit/main/docs/images/designer-receipt.png" alt="Receipt template designer with block list, properties and live receipt preview" width="1400" height="860"></a></p>
+<p><a href="designer/?kind=label">Label mode</a> has drag-to-position and shows the ZPL, TSPL or EZPL it generates.</p>
+
+<h2>Guides</h2>
+<!--GUIDES-->
+
+<h2>Supported printers</h2>
+<table>
+  <tr><th>Family</th><th>Profile or encoder</th><th>Command set</th></tr>
+  <tr><td>Epson TM-T88V / VI / VII, TM-T20III, TM-m30</td><td><code>epson-tm-t88</code>, <code>epson-tm-t20</code>, <code>epson-tm-m30</code></td><td>ESC/POS</td></tr>
+  <tr><td>Bixolon, Citizen, SNBC, Xprinter, Rongta, HPRT, POS-X</td><td><code>generic-escpos</code>, <code>generic-escpos-58</code></td><td>ESC/POS</td></tr>
+  <tr><td>Star TSP650II, TSP700II, mC-Print3</td><td><code>star-tsp650</code>, <code>star-mc-print3</code></td><td>Star Line Mode</td></tr>
+  <tr><td>Star TSP100, TSP143</td><td><code>star-tsp100</code></td><td>Star raster</td></tr>
+  <tr><td>Zebra label printers</td><td><code>encodeZpl</code></td><td>ZPL II</td></tr>
+  <tr><td>TSC, Xprinter, Rongta label printers</td><td><code>encodeTspl</code></td><td>TSPL</td></tr>
+  <tr><td>Godex label printers</td><td><code>encodeEzpl</code></td><td>EZPL</td></tr>
+</table>
+
+<h2>Compared with escpos and node-thermal-printer</h2>
+<table>
+  <tr><th></th><th>retail-print-kit</th><th>escpos</th><th>node-thermal-printer</th></tr>
+  <tr><td>Epson ESC/POS and compatibles</td><td>yes</td><td>yes</td><td>yes</td></tr>
+  <tr><td>Star Line Mode</td><td>yes</td><td>no</td><td>yes</td></tr>
+  <tr><td>Star raster-only (TSP100 / TSP143)</td><td>yes</td><td>no</td><td>no</td></tr>
+  <tr><td>Label printers (ZPL, TSPL, EZPL)</td><td>yes</td><td>no</td><td>no</td></tr>
+  <tr><td>JSON templates and a designer</td><td>yes</td><td>no</td><td>no</td></tr>
+  <tr><td>HTML / PNG / SVG preview</td><td>yes</td><td>no</td><td>no</td></tr>
+  <tr><td>Packages a plain install adds (measured Oct 2026)</td><td>4</td><td>66</td><td>7</td></tr>
+</table>
+<p>Coming from one of them? Read the <a href="guides/escpos-node-thermal-printer-alternative.html">migration guide</a>.</p>
+
+<h2>Command line</h2>
+<pre><code>npx retail-print-kit discover --identify          # printers on this network
+npx retail-print-kit test --net 192.168.1.50      # test page and status
+npx retail-print-kit drawer --usb                 # kick the cash drawer
+npx retail-print-kit preview --out receipt.html   # no printer needed</code></pre>
+
+<h2>Questions</h2>
+<h3>Does it work in Electron?</h3>
+<p>Yes, in the main process. The renderer asks for prints over IPC, and the browser build renders previews. See <a href="guides/electron-receipt-printing.html">printing receipts from Electron</a>.</p>
+<h3>Does it need a printer driver?</h3>
+<p>No. It sends the printer's own commands directly over TCP, USB or serial, so there is no OS print dialog and no driver to install.</p>
+<h3>Why does my Star TSP100 print nothing with other libraries?</h3>
+<p>It is a raster-only printer and ignores ESC/POS text. Use the <code>star-tsp100</code> profile; see <a href="guides/star-tsp100-nodejs.html">the Star TSP100 guide</a>.</p>
+<h3>Is it free?</h3>
+<p>Yes. MIT license, source on <a href="https://github.com/arka162/retail-print-kit">GitHub</a>.</p>

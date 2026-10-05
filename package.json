@@ -1,7 +1,7 @@
 {
   "name": "retail-print-kit",
-  "version": "0.2.2",
-  "description": "Receipt printers, cash drawers and label printers for Node.js and Electron: ESC/POS (Epson and compatibles), Star, ZPL, TSPL, EZPL; USB, network and serial; templates, previews, a visual designer and a CLI.",
+  "version": "0.2.3",
+  "description": "ESC/POS thermal receipt printer, cash drawer and label printer (ZPL, TSPL, EZPL) library for Node.js and Electron. Epson, Star TSP100 and compatibles over USB, network or serial, with templates, previews, a visual designer and a CLI.",
   "author": "Arkaprova Majumder <arka162@gmail.com>",
   "license": "MIT",
   "repository": {
@@ -37,7 +37,8 @@
     "dist",
     "bin",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "engines": {
     "node": ">=18"
@@ -47,7 +48,8 @@
     "test": "npm run build && node --test test/run.js",
     "clean": "rm -rf dist",
     "build:browser": "esbuild src/browser.ts --bundle --format=iife --global-name=RetailPrintKit --platform=browser --external:zlib --outfile=dist/browser/retail-print-kit.js --minify --sourcemap && esbuild src/browser.ts --bundle --format=esm --platform=browser --external:zlib --outfile=dist/browser/retail-print-kit.mjs --minify",
-    "prepublishOnly": "npm test"
+    "prepublishOnly": "npm test",
+    "build:site": "node scripts/build-site.js"
   },
   "dependencies": {
     "iconv-lite": "^0.6.3",

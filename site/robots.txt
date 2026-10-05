@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://arka162.github.io/retail-print-kit/sitemap.xml

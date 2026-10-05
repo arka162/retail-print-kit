@@ -10,7 +10,7 @@ A modern replacement for `escpos` / `node-thermal-printer`: ESC/POS **and** Star
 network / serial, printer profiles instead of model `if`s, receipt and label **templates**, live
 **previews**, a visual **designer**, and a CLI for testing hardware in the field.
 
-**[Open the designer](https://arka162.github.io/retail-print-kit/)** · [Printer matrix](docs/printer-matrix.md) · [Hardware checklist](docs/hardware-checklist.md)
+**[Website](https://arka162.github.io/retail-print-kit/)** · **[Designer](https://arka162.github.io/retail-print-kit/designer/)** · [Guides](https://arka162.github.io/retail-print-kit/guides/) · [Printer matrix](docs/printer-matrix.md) · [Changelog](CHANGELOG.md)
 
 ![Receipt designer](https://raw.githubusercontent.com/arka162/retail-print-kit/main/docs/images/designer-receipt.png)
 
@@ -76,6 +76,19 @@ with a device swap. Other transports:
 const { UsbTransport } = require('retail-print-kit/usb');       // new UsbTransport() or { vendorId, productId }
 const { SerialTransport } = require('retail-print-kit/serial'); // new SerialTransport('COM3', { baudRate: 9600 })
 ```
+
+## Guides
+
+* [Print a receipt from Node.js on an ESC/POS thermal printer](https://arka162.github.io/retail-print-kit/guides/print-receipt-nodejs.html)
+* [Print receipts from an Electron app](https://arka162.github.io/retail-print-kit/guides/electron-receipt-printing.html)
+* [Open a cash drawer](https://arka162.github.io/retail-print-kit/guides/open-cash-drawer-nodejs.html)
+* [Print to a Star TSP100 or TSP143](https://arka162.github.io/retail-print-kit/guides/star-tsp100-nodejs.html)
+* [Print ZPL, TSPL and EZPL labels](https://arka162.github.io/retail-print-kit/guides/zpl-tspl-ezpl-label-printing-nodejs.html)
+* [Receipt and label templates and the visual designer](https://arka162.github.io/retail-print-kit/guides/receipt-template-designer.html)
+* [QR codes and barcodes](https://arka162.github.io/retail-print-kit/guides/print-qr-code-barcode-receipt.html)
+* [Print a logo or image](https://arka162.github.io/retail-print-kit/guides/print-logo-image-thermal-printer.html)
+* [Find printers on the network and read status](https://arka162.github.io/retail-print-kit/guides/network-printer-discovery-status.html)
+* [Migrating from escpos or node-thermal-printer](https://arka162.github.io/retail-print-kit/guides/escpos-node-thermal-printer-alternative.html)
 
 ## Supported printers
 
@@ -159,7 +172,7 @@ const label = renderLabel(labelTemplate, data); // from a designer JSON
 
 ## Designer
 
-**https://arka162.github.io/retail-print-kit/** edits receipt and label templates in the browser:
+**https://arka162.github.io/retail-print-kit/designer/** edits receipt and label templates in the browser:
 block palette, nested `each` / `if`, property editor, sample data, live preview, drag-to-position
 on labels, logo upload with dithering, JSON import and export. It runs entirely in the page from
 the browser bundle (`retail-print-kit/browser`); nothing is uploaded.
@@ -200,6 +213,20 @@ npx retail-print-kit profiles
 ```
 
 Add `--dry` to any printing command to dump the bytes as hex instead of sending them.
+
+## FAQ
+
+**Does it work in Electron?** Yes, in the main process; the renderer asks for prints over IPC and the
+browser build renders previews.
+
+**Does it need a printer driver?** No. It sends the printer's own commands over TCP, USB or serial,
+so there is no OS print dialog and nothing to install on the machine.
+
+**Why does a Star TSP100 print nothing with other libraries?** It is raster-only and ignores ESC/POS
+text. Use the `star-tsp100` profile.
+
+**Can I print without a printer attached?** `--dry` dumps the bytes, and the HTML, PNG and SVG
+previews show the result.
 
 ## Status of hardware verification
 
