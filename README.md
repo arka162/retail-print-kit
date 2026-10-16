@@ -197,6 +197,23 @@ ld.designFromBuiltin(builtin, 'ezpl');                          // editable copy
 The import has no DOM access, so it runs in Node, Electron and the browser. The fonts the designer
 uses are in `dist/label-fonts/` with their licences; serve them and call `ld.ensureLabelFonts(url)`.
 
+### The label designer element (`retail-print-kit/label-designer`)
+
+A framework-free Web Component for apps where people design labels: palette of item fields, drag and
+resize with guides and snapping, undo and redo, properties per element, logo upload, printer view
+and a check against real items. It works in any framework (Angular, React, plain pages) and in Electron.
+
+```js
+import 'retail-print-kit/label-designer';              // defines <rpk-label-designer> and <rpk-label-preview>
+const el = document.querySelector('rpk-label-designer');
+el.fontsUrl = '/assets/label-fonts/';
+el.design = design; el.name = 'Shelf tag';
+el.itemSource = { search: (q) => api.items(q), page: (offset, limit) => api.page(offset, limit) };
+el.addEventListener('designsave', (e) => api.save(e.detail.name, e.detail.design).then(() => el.markSaved()));
+```
+
+Put your own buttons in its toolbar with `slot="actions"`. Colours come from `--rpk-*` CSS variables.
+
 ## Designer
 
 **https://arka162.github.io/retail-print-kit/designer/** edits receipt and label templates in the browser:

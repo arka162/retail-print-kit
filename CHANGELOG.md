@@ -3,6 +3,7 @@
 ## 0.3.0 (unreleased)
 
 * `retail-print-kit/label-design`: label designs in millimetres (design JSON version 1) with validation, one canvas renderer for screen and print, an EZPL/ZPL encoder (printer-font elements as native commands, designer fonts, QR codes and logos as graphics), printer offsets, eleven built-in shelf-label layouts and the fonts with their licences in `dist/label-fonts/`.
+* `retail-print-kit/label-designer`: the `<rpk-label-designer>` Web Component (palette, drag and resize, guides, undo/redo, properties, logo upload, printer view, check against real items) and `<rpk-label-preview>`. Defined only in a browser; requiring it in Node does nothing.
 * `typesVersions` so TypeScript projects using `moduleResolution: node` find the types of every subpath.
 
 ## 0.2.3 (2026-10-05)

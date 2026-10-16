@@ -135,3 +135,10 @@ test('the root entry does not carry the label designer', () => {
   assert.equal(root.encodeDesignLabel, undefined);
   assert.equal(root.BUILTIN_TEMPLATES, undefined);
 });
+
+test('the designer entry can be required outside a browser', () => {
+  const designer = require('../dist/label-designer');
+  assert.equal(typeof designer.defineLabelDesigner, 'function');
+  assert.equal(typeof designer.defineLabelPreview, 'function');
+  designer.defineLabelDesigner();
+});

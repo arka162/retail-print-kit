@@ -36,6 +36,10 @@
       "types": "./dist/label-design/index.d.ts",
       "default": "./dist/label-design/index.js"
     },
+    "./label-designer": {
+      "types": "./dist/label-designer/index.d.ts",
+      "default": "./dist/label-designer/index.js"
+    },
     "./label-fonts/*": "./dist/label-fonts/*"
   },
   "typesVersions": {
@@ -54,6 +58,9 @@
       ],
       "label-design": [
         "dist/label-design/index.d.ts"
+      ],
+      "label-designer": [
+        "dist/label-designer/index.d.ts"
       ]
     }
   },
@@ -68,7 +75,7 @@
     "node": ">=18"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json && npm run build:assets && npm run build:browser",
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.designer.json && npm run build:assets && npm run build:browser",
     "build:assets": "node scripts/copy-assets.js",
     "test": "npm run build && node --test test/run.js",
     "clean": "rm -rf dist",
