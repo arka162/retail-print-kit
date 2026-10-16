@@ -133,7 +133,7 @@ const guideDir = path.join(ROOT, 'docs', 'guides');
 const ORDER = [
   'print-receipt-nodejs', 'electron-receipt-printing', 'open-cash-drawer-nodejs', 'star-tsp100-nodejs',
   'zpl-tspl-ezpl-label-printing-nodejs', 'receipt-template-designer', 'print-qr-code-barcode-receipt',
-  'print-logo-image-thermal-printer', 'network-printer-discovery-status', 'escpos-node-thermal-printer-alternative',
+  'label-design-shelf-labels', 'print-logo-image-thermal-printer', 'network-printer-discovery-status', 'escpos-node-thermal-printer-alternative',
 ];
 const guides = fs.readdirSync(guideDir).filter((f) => f.endsWith('.md')).map((f) => {
   const slug = f.replace(/\.md$/, '');

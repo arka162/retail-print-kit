@@ -85,6 +85,7 @@ const { SerialTransport } = require('retail-print-kit/serial'); // new SerialTra
 * [Print to a Star TSP100 or TSP143](https://arka162.github.io/retail-print-kit/guides/star-tsp100-nodejs.html)
 * [Print ZPL, TSPL and EZPL labels](https://arka162.github.io/retail-print-kit/guides/zpl-tspl-ezpl-label-printing-nodejs.html)
 * [Receipt and label templates and the visual designer](https://arka162.github.io/retail-print-kit/guides/receipt-template-designer.html)
+* [Design shelf labels in millimetres and print them on Godex or Zebra](https://arka162.github.io/retail-print-kit/guides/label-design-shelf-labels.html)
 * [QR codes and barcodes](https://arka162.github.io/retail-print-kit/guides/print-qr-code-barcode-receipt.html)
 * [Print a logo or image](https://arka162.github.io/retail-print-kit/guides/print-logo-image-thermal-printer.html)
 * [Find printers on the network and read status](https://arka162.github.io/retail-print-kit/guides/network-printer-discovery-status.html)
@@ -170,6 +171,32 @@ const label = renderLabel(labelTemplate, data); // from a designer JSON
 
 ![Label designer](https://raw.githubusercontent.com/arka162/retail-print-kit/main/docs/images/designer-label.png)
 
+## Label designs (`retail-print-kit/label-design`)
+
+A label design is a JSON document in millimetres (`version: 1`) made of text, price, barcode, QR, line,
+box, fill and image elements with `{{field}}` placeholders. One renderer draws it on screen and at
+printer resolution, so the preview is the print; one encoder turns it into EZPL (Godex) or ZPL (Zebra).
+Elements with a printer-font pattern print as native commands byte for byte; designer fonts, prices,
+QR codes and logos go as graphics (ZPL `^GFA`, EZPL `Q`). Eleven classic shelf-label layouts ship as
+built-ins.
+
+```js
+const ld = require('retail-print-kit/label-design');
+
+ld.validateDesign(design);                                      // null, or the first problem
+const data = ld.labelDataFromItem(item, { storeName: 'Main' }); // itemName, price, barcode, ...
+ld.drawLabel(canvas, design, data, { ppm: 8 });                 // screen preview, returns warnings
+const rasterize = ld.createRasterizer();                        // browser canvas, or pass canvasFactory
+const bytes = ld.encodeDesignLabel(design, 'zpl', data, rasterize, { x: 0, y: 0 });
+
+const builtin = ld.findBuiltinTemplate('2 X 1', 'dual', 'ezpl');
+ld.encodeBuiltinLabel(builtin, 'ezpl', data);                   // printer fonts only
+ld.designFromBuiltin(builtin, 'ezpl');                          // editable copy, prints the same
+```
+
+The import has no DOM access, so it runs in Node, Electron and the browser. The fonts the designer
+uses are in `dist/label-fonts/` with their licences; serve them and call `ld.ensureLabelFonts(url)`.
+
 ## Designer
 
 **https://arka162.github.io/retail-print-kit/designer/** edits receipt and label templates in the browser:
@@ -232,7 +259,7 @@ previews show the result.
 
 Encoders are covered by byte-exact tests. Items still to be confirmed on real units are listed in
 the [hardware checklist](docs/hardware-checklist.md): Star raster cut modes, Star status bits,
-Godex font sizes, and QR syntax on EZPL and TSPL. Reports from the field are welcome as issues.
+Godex font sizes, QR syntax on EZPL and TSPL, and the `label-design` graphics commands (EZPL `Q`, ZPL `^GFA`). Reports from the field are welcome as issues.
 
 ## License
 

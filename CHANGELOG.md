@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0 (unreleased)
+
+* `retail-print-kit/label-design`: label designs in millimetres (design JSON version 1) with validation, one canvas renderer for screen and print, an EZPL/ZPL encoder (printer-font elements as native commands, designer fonts, QR codes and logos as graphics), printer offsets, eleven built-in shelf-label layouts and the fonts with their licences in `dist/label-fonts/`.
+* `typesVersions` so TypeScript projects using `moduleResolution: node` find the types of every subpath.
+
 ## 0.2.3 (2026-10-05)
 
 * Website with a landing page and ten task guides (receipts, Electron, cash drawer, Star TSP100, labels, templates, QR and barcodes, logos, discovery and status, migration from escpos / node-thermal-printer).

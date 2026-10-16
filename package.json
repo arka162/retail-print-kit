@@ -31,6 +31,30 @@
       "types": "./dist/browser.d.ts",
       "import": "./dist/browser/retail-print-kit.mjs",
       "default": "./dist/browser/retail-print-kit.js"
+    },
+    "./label-design": {
+      "types": "./dist/label-design/index.d.ts",
+      "default": "./dist/label-design/index.js"
+    },
+    "./label-fonts/*": "./dist/label-fonts/*"
+  },
+  "typesVersions": {
+    "*": {
+      "net": [
+        "dist/transports/net.d.ts"
+      ],
+      "usb": [
+        "dist/transports/usb.d.ts"
+      ],
+      "serial": [
+        "dist/transports/serial.d.ts"
+      ],
+      "browser": [
+        "dist/browser.d.ts"
+      ],
+      "label-design": [
+        "dist/label-design/index.d.ts"
+      ]
     }
   },
   "files": [
@@ -44,7 +68,8 @@
     "node": ">=18"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json && npm run build:browser",
+    "build": "tsc -p tsconfig.json && npm run build:assets && npm run build:browser",
+    "build:assets": "node scripts/copy-assets.js",
     "test": "npm run build && node --test test/run.js",
     "clean": "rm -rf dist",
     "build:browser": "esbuild src/browser.ts --bundle --format=iife --global-name=RetailPrintKit --platform=browser --external:zlib --outfile=dist/browser/retail-print-kit.js --minify --sourcemap && esbuild src/browser.ts --bundle --format=esm --platform=browser --external:zlib --outfile=dist/browser/retail-print-kit.mjs --minify",
