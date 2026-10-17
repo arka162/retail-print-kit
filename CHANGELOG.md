@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1 (2026-10-17)
+
+* `<rpk-label-designer>`: a clearer left bar. The search field keeps its full height and matches the other inputs, item fields and basic elements show icons, sections show their counts, the drag tip sits in its own box and layers show the element icon with an accent bar on the selected one. The left bar is a little wider so field names are not cut.
+
 ## 0.3.0 (2026-10-17)
 
 * `retail-print-kit/label-design`: label designs in millimetres (design JSON version 1) with validation, one canvas renderer for screen and print, an EZPL/ZPL encoder (printer-font elements as native commands, designer fonts, QR codes and logos as graphics), printer offsets, eleven built-in shelf-label layouts and the fonts with their licences in `dist/label-fonts/`.

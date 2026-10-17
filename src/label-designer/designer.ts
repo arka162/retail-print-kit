@@ -36,9 +36,32 @@ export interface LabelDesignerElement extends HTMLElement {
 interface PaletteEntry { kind: ElementType; label: string; icon: string; }
 
 const BASIC_PALETTE: PaletteEntry[] = [
-  { kind: 'text', label: 'Text', icon: 'T' }, { kind: 'line', label: 'Line', icon: '—' }, { kind: 'box', label: 'Box', icon: '▢' },
-  { kind: 'fill', label: 'Filled box', icon: '■' }, { kind: 'qr', label: 'QR code', icon: '⌗' }, { kind: 'image', label: 'Logo', icon: '◪' }
+  { kind: 'text', label: 'Text', icon: 'type' }, { kind: 'line', label: 'Line', icon: 'line' }, { kind: 'box', label: 'Box', icon: 'square' },
+  { kind: 'fill', label: 'Filled box', icon: 'fill' }, { kind: 'qr', label: 'QR code', icon: 'qr' }, { kind: 'image', label: 'Logo', icon: 'image' }
 ];
+const ICON_PATHS: { [name: string]: string } = {
+  search: '<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',
+  info: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/>',
+  text: '<path d="M4 6.5h16M4 12h16M4 17.5h10"/>',
+  type: '<path d="M5 6h14M12 6v13M9.5 19h5"/>',
+  dollar: '<path d="M12 3.5v17M16 7.5c-.6-1.4-2.1-2.2-4-2.2-2.3 0-4 1.2-4 3 0 4.4 8.2 2.3 8.2 6.6 0 1.9-1.8 3.1-4.2 3.1-2 0-3.7-.9-4.3-2.5"/>',
+  box: '<path d="M3.5 7.5L12 3.5l8.5 4v9L12 20.5l-8.5-4z"/><path d="M3.5 7.5L12 11.5l8.5-4M12 11.5v9"/>',
+  store: '<path d="M4.5 10.5v9h15v-9"/><path d="M3.5 10.5l1.8-6h13.4l1.8 6c0 1.4-1.2 2.3-2.6 2.3s-2.6-.9-2.6-2.3c0 1.4-1.2 2.3-2.6 2.3s-2.7-.9-2.7-2.3c0 1.4-1.2 2.3-2.6 2.3s-2.5-.9-2.5-2.3z"/><path d="M10 19.5v-4.5h4v4.5"/>',
+  layers: '<path d="M12 3.5l8.5 4.5-8.5 4.5L3.5 8z"/><path d="M3.5 12.5l8.5 4.5 8.5-4.5M3.5 16.5l8.5 4.5 8.5-4.5"/>',
+  truck: '<path d="M3 6.5h11v9H3zM14 9.5h3.5l3 3.2v2.8H14"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>',
+  hash: '<path d="M5 9h14M5 15h14M10.5 4l-2 16M15.5 4l-2 16"/>',
+  barcode: '<path d="M4 5v14M7 5v14M10.5 5v14M13 5v14M16.5 5v14M20 5v14"/>',
+  calendar: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  line: '<path d="M4 12h16"/>',
+  square: '<rect x="4.5" y="4.5" width="15" height="15" rx="2"/>',
+  fill: '<rect x="4.5" y="4.5" width="15" height="15" rx="2" fill="currentColor"/>',
+  qr: '<rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><path d="M14 14h2.5v2.5H14zM18 18h2.5v2.5H18zM18 14h2.5M14 18v2.5"/>',
+  image: '<rect x="3.5" y="5" width="17" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="M20.5 15.5l-4.8-4.8-8.2 8.3"/>'
+};
+const ELEMENT_ICONS: { [type: string]: string } = { text: 'type', price: 'dollar', barcode: 'barcode', qr: 'qr', box: 'square', fill: 'fill', line: 'line', image: 'image' };
+function icon(name: string): string {
+  return `<svg class="ld-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON_PATHS[name] || ICON_PATHS.text}</svg>`;
+}
 const HANDLES: Handle[] = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
 const ZOOMS = [0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4];
 const CSS_PX_PER_MM = 96 / MM_PER_INCH;
@@ -235,14 +258,20 @@ export function defineLabelDesigner(tag = 'rpk-label-designer'): void {
   </div>
   <div class="ld-body" data-ref="body">
     <aside class="ld-left">
-      <input class="lt-input" type="text" placeholder="Search fields…" data-input="palette">
-      <span class="lt-eyebrow">Item fields</span>
-      <div class="ld-tiles" data-ref="fields"></div>
-      <span class="lt-eyebrow">Basic</span>
-      <div class="ld-tiles" data-ref="basic"></div>
-      <p class="lt-note">Drag a field onto the label, or click it to add it at the top left.</p>
-      <span class="lt-eyebrow">Layers</span>
-      <div class="ld-layers" data-ref="layers"></div>
+      <label class="ld-search">${icon('search')}<input class="lt-input" type="text" placeholder="Search fields…" aria-label="Search fields" data-input="palette"></label>
+      <div class="ld-group">
+        <div class="ld-group-head"><span class="lt-eyebrow">Item fields</span><span class="ld-count" data-ref="fieldCount"></span></div>
+        <div class="ld-tiles" data-ref="fields"></div>
+      </div>
+      <div class="ld-group">
+        <div class="ld-group-head"><span class="lt-eyebrow">Basic</span></div>
+        <div class="ld-tiles ld-tiles-basic" data-ref="basic"></div>
+      </div>
+      <p class="ld-tip">${icon('info')}<span>Drag a field onto the label, or click it to add it at the top left.</span></p>
+      <div class="ld-group">
+        <div class="ld-group-head"><span class="lt-eyebrow">Layers</span><span class="ld-count" data-ref="layerCount"></span></div>
+        <div class="ld-layers" data-ref="layers"></div>
+      </div>
     </aside>
     <section class="ld-center" data-ref="center">
       <div class="ld-board">
@@ -866,15 +895,25 @@ export function defineLabelDesigner(tag = 'rpk-label-designer'): void {
       const q = this.paletteFilter.trim().toLowerCase();
       const fields = FIELDS.filter((f: FieldOption) => !q || f.label.toLowerCase().includes(q));
       const dis = this.canWrite ? '' : ' disabled';
-      this.refs.fields.innerHTML = fields.map((f) => `<button type="button" class="ld-tile" draggable="true" data-act="add" data-kind="${this.kindFor(f.key)}" data-field="${esc(f.key)}"${dis}>${esc(f.label)}</button>`).join('');
-      this.refs.basic.innerHTML = BASIC_PALETTE.map((b) => `<button type="button" class="ld-tile" draggable="true" data-act="add" data-kind="${b.kind}"${dis}><i>${b.icon}</i>${esc(b.label)}</button>`).join('');
+      this.refs.fields.innerHTML = fields.length
+        ? fields.map((f) => `<button type="button" class="ld-tile" draggable="true" data-act="add" data-kind="${this.kindFor(f.key)}" data-field="${esc(f.key)}"${dis}><span class="ld-tile-ico">${icon(f.icon)}</span><span class="ld-tile-label">${esc(f.label)}</span></button>`).join('')
+        : '<span class="lt-note ld-none">No fields match.</span>';
+      this.refs.fieldCount.textContent = String(fields.length);
+      this.refs.basic.innerHTML = BASIC_PALETTE.map((b) => `<button type="button" class="ld-tile" draggable="true" data-act="add" data-kind="${b.kind}"${dis}><span class="ld-tile-ico">${icon(b.icon)}</span><span class="ld-tile-label">${esc(b.label)}</span></button>`).join('');
+    }
+
+    private layerIcon(el: LabelElement): string {
+      const f = this.boundField(el);
+      const field = el.type === 'text' && f ? FIELDS.find((x: FieldOption) => x.key === f) : undefined;
+      return field ? field.icon : ELEMENT_ICONS[el.type] || 'square';
     }
 
     private renderLayers(): void {
       const d = this.d;
       if (!d) return;
+      this.refs.layerCount.textContent = String(d.elements.length);
       this.refs.layers.innerHTML = d.elements.length
-        ? d.elements.slice().reverse().map((el) => `<button type="button" class="ld-layer${on(el.id === this.selectedId)}" data-act="layer" data-v="${esc(el.id)}">${esc(this.elementTitle(el))}${this.isNative(el) ? '<small>printer font</small>' : ''}</button>`).join('')
+        ? d.elements.slice().reverse().map((el) => `<button type="button" class="ld-layer${on(el.id === this.selectedId)}" data-act="layer" data-v="${esc(el.id)}">${icon(this.layerIcon(el))}<span class="ld-layer-name">${esc(this.elementTitle(el))}</span>${this.isNative(el) ? '<small>printer font</small>' : ''}</button>`).join('')
         : '<span class="lt-note">Nothing on the label yet.</span>';
     }
 
