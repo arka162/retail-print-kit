@@ -1,6 +1,6 @@
 {
   "name": "retail-print-kit",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "ESC/POS thermal receipt printer, cash drawer and label printer (ZPL, TSPL, EZPL) library for Node.js and Electron. Epson, Star TSP100 and compatibles over USB, network or serial, with templates, previews, a visual designer and a CLI.",
   "author": "Arkaprova Majumder <arka162@gmail.com>",
   "license": "MIT",
