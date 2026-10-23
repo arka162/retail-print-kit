@@ -52,6 +52,7 @@ const ICON_PATHS: { [name: string]: string } = {
   hash: '<path d="M5 9h14M5 15h14M10.5 4l-2 16M15.5 4l-2 16"/>',
   barcode: '<path d="M4 5v14M7 5v14M10.5 5v14M13 5v14M16.5 5v14M20 5v14"/>',
   calendar: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  pin: '<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/>',
   line: '<path d="M4 12h16"/>',
   square: '<rect x="4.5" y="4.5" width="15" height="15" rx="2"/>',
   fill: '<rect x="4.5" y="4.5" width="15" height="15" rx="2" fill="currentColor"/>',

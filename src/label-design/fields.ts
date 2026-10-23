@@ -10,6 +10,7 @@ export const FIELDS: FieldOption[] = [
   { key: 'department', label: 'Department', icon: 'layers', sample: 'BEER' },
   { key: 'vendor', label: 'Vendor', icon: 'truck', sample: 'SOUTHERN GLAZER' },
   { key: 'reorderId', label: 'Reorder #', icon: 'hash', sample: '100482' },
+  { key: 'spot', label: 'Store spot', icon: 'pin', sample: 'A05-B2-S3' },
   { key: 'barcode', label: 'UPC', icon: 'barcode', sample: '018200007712' },
   { key: 'printDate', label: 'Print date', icon: 'calendar', sample: '10/14/2026' },
   { key: 'storeName', label: 'Store name', icon: 'store', sample: 'Main Street Market' }
@@ -55,7 +56,7 @@ export interface ItemDataOptions {
 
 /**
  * Label fields from an item record: `posdecs`/`item_name`, `price`, `surcharge_amount`, `brand`, `size_unit`,
- * `re_order`, `upc` (string or list), `department`, `vendor`.
+ * `re_order`, `upc` (string or list), `department`, `vendor`, `spot` (the item's main spot in the store).
  */
 export function labelDataFromItem(item: any, opts: ItemDataOptions = {}): LabelData {
   const limits = { itemName: Infinity, brand: Infinity, ...(opts.limits || {}) };
@@ -74,6 +75,7 @@ export function labelDataFromItem(item: any, opts: ItemDataOptions = {}): LabelD
     creditPrice,
     department: item.department || '',
     vendor: item.vendor || '',
+    spot: item.spot || '',
     printDate: (opts.date || new Date()).toLocaleDateString('en-US'),
     storeName: opts.storeName || ''
   };
