@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0 (2026-10-23)
+
+* `retail-print-kit/label-design`: a **Store spot** field (`{{spot}}`, from the item's `spot`) for the item's main spot in the store, such as `A05-B2-S3`. Empty when the item has none, so `when: 'spot'` hides it. Built-in layouts do not use it and print the same bytes.
+
 ## 0.3.1 (2026-10-17)
 
 * `<rpk-label-designer>`: a clearer left bar. The search field keeps its full height and matches the other inputs, item fields and basic elements show icons, sections show their counts, the drag tip sits in its own box and layers show the element icon with an accent bar on the selected one. The left bar is a little wider so field names are not cut.

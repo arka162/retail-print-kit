@@ -98,6 +98,10 @@ test('label fields from an item', () => {
   assert.equal(d.barcode, '000000012345');
   assert.equal(d.reorderId, '--');
   assert.equal(d.department, 'LIQUOR');
+  assert.equal(d.spot, '');
+  assert.equal(ld.labelDataFromItem({ spot: 'A05-B2-S3' }).spot, 'A05-B2-S3');
+  assert.equal(ld.isVisible({ when: 'spot' }, d), false);
+  assert.equal(ld.sampleData().spot, 'A05-B2-S3');
   assert.equal(d.printDate, '10/16/2026');
   assert.equal(ld.labelDataFromItem({ price: '5', surcharge_amount: 6 }, { priceType: 'credit' }).price, '$6.00');
   assert.deepEqual(ld.fieldsUsed({ elements: [{ value: '{{a}} {{b}}', when: 'c' }, { value: '{{a}}' }] }).sort(), ['a', 'b', 'c']);
